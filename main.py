@@ -1,5 +1,5 @@
 import random
-import PIL import Image
+from PIL import Image
 
 # 이미지 로드
 image = Image.open("image.jpg")
