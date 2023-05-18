@@ -7,7 +7,6 @@ class Room:
         self.y = y
         self.status = "saferoom"
 
-
 class Player:
     def __init__(self, x, y):
         self.x = x
