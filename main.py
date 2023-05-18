@@ -47,7 +47,7 @@ def textOutput(text):
     text_surface = font.render(text, True, text_color)
     textArr.append(text_surface)
     if len(textArr) > 10:
-        del textArr[-1]
+        del textArr[0]
 
 
 while True:
@@ -58,7 +58,7 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            textOutput("fuck you")
+            textOutput("sex")
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
             if event.key == pygame.K_RIGHT:
