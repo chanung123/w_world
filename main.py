@@ -18,10 +18,10 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
-x = 0  # (0,0)
+EDGE = 0  # (0,0)
 BOXSCALE = 130
-z = 100
-r = 35
+MARGIN = 100
+FIREPOSITION = 35
 
 ## 게임 창 설정 ##
 screen = pygame.display.set_mode((1300, 720))
@@ -59,10 +59,10 @@ def point(postionx, postiony):
     """플레이어 포지션 정하기"""
     if postionx >= 0 and postionx <= 3:
         if postiony >= 0 and postiony <= 3:
-            return ((postionx * BOXSCALE) + z, ((postiony) * BOXSCALE) + z)
+            return ((postionx * BOXSCALE) + MARGIN, ((postiony) * BOXSCALE) + MARGIN)
 
     if postionx > 3 or postiony > 3:
-        return (((postionx) * BOXSCALE) + z, ((postiony - 1) * BOXSCALE) + z)
+        return (((postionx) * BOXSCALE) + MARGIN, ((postiony - 1) * BOXSCALE) + MARGIN)
 
 
 def dark():
@@ -111,14 +111,21 @@ while True:
     screen.fill(BLACK)
 
     screen.blit(map_img, (24, 10))
-    screen.blit(fire_img, (BOXSCALE + r, 0))
-    screen.blit(fire_img, ((3 * BOXSCALE) + r, 0))
-    screen.blit(fire_img_down, (BOXSCALE + r, BOXSCALE * 4 + r * 2))
-    screen.blit(fire_img_down, ((3 * BOXSCALE) + 35, BOXSCALE * 4 + r * 2))
-    screen.blit(fire_img_left, (0, BOXSCALE + r))
-    screen.blit(fire_img_left, (0, (3 * BOXSCALE) + r))
-    screen.blit(fire_img_right, ((4 * BOXSCALE) + r * 2, BOXSCALE + r))
-    screen.blit(fire_img_right, ((4 * BOXSCALE) + r * 2, (3 * BOXSCALE) + r))
+    screen.blit(fire_img, (BOXSCALE + FIREPOSITION, 0))
+    screen.blit(fire_img, ((3 * BOXSCALE) + FIREPOSITION, 0))
+    screen.blit(
+        fire_img_down, (BOXSCALE + FIREPOSITION, BOXSCALE * 4 + FIREPOSITION * 2)
+    )
+    screen.blit(fire_img_down, ((3 * BOXSCALE) + 35, BOXSCALE * 4 + FIREPOSITION * 2))
+    screen.blit(fire_img_left, (0, BOXSCALE + FIREPOSITION))
+    screen.blit(fire_img_left, (0, (3 * BOXSCALE) + FIREPOSITION))
+    screen.blit(
+        fire_img_right, ((4 * BOXSCALE) + FIREPOSITION * 2, BOXSCALE + FIREPOSITION)
+    )
+    screen.blit(
+        fire_img_right,
+        ((4 * BOXSCALE) + FIREPOSITION * 2, (3 * BOXSCALE) + FIREPOSITION),
+    )
     screen.blit(wumpus_img, (point(2, 2)))
     screen.blit(wumpus_img, (point(0, 2)))
     screen.blit(pitch_img, (point(2, 3)))
