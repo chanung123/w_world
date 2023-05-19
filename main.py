@@ -2,6 +2,50 @@
 import sys
 import pygame
 
+
+class Room:
+    """방"""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.status = "saferoom"
+        self.view = False
+
+
+class Player:
+    """플레이어"""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.arrows = 2
+
+    def shoot_arrow(self, direction, currentroom):
+        if self.arrows > 0:
+            self.arrows -= 1
+            if direction == "w":
+                print("나이샷! 웜푸스가 뒤졌습니다!")
+            else:
+                print("어따쏘는거죠? 웜푸스를 놓쳤습니다.")
+
+    def sense_wumpus(self, currentroom):
+        """웜푸스 감지"""
+        # TODO: 4가지 방향에 웜푸스가 있을경우 snetch
+        if currentroom.status == "wumpus":
+            print("You smell a Wumpus!")
+        else:
+            print("You don't smell a Wumpus.")
+
+    def sense_pit(self, currentroom):
+         """웅덩이 감지"""
+        # TODO: 4가지 방향에 웅덩이가 있을경우 breeze
+        if currentroom.status == "pit":
+            print("You feel a breeze!")
+        else:
+            print("You don't feel a breeze.")
+
+
 # Initialize the game engine
 # pylint: disable=no-member
 pygame.init()
@@ -45,14 +89,9 @@ fire_img_right = pygame.transform.rotate(fire_img, -90)
 
 gold_img = renderimg("assets/gold in box.png")
 wumpus_img = renderimg("assets/wumpus.png")
-pitch_img = renderimg("assets/pitch.png")
-pitch_img2 = renderimg("assets/pitch_rava.png")
+pit_img = renderimg("assets/pitch_rava.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
-
-# pylint: disable=C0103
-Player_posX = 0
-Player_posY = 0
 
 
 def point(postionx, postiony):
@@ -63,14 +102,6 @@ def point(postionx, postiony):
 
     if postionx > 3 or postiony > 3:
         return (((postionx) * BOXSCALE) + MARGIN, ((postiony - 1) * BOXSCALE) + MARGIN)
-
-
-def dark():
-    """검은화면으로 가리기"""
-    for i in range(4):
-        for j in range(4):
-            if i != Player_posX or j != Player_posY:
-                screen.blit(dark_img, (point(i, j)))
 
 
 text_color = WHITE  # Black
@@ -88,28 +119,36 @@ def textoutput(outtext):
         del textArr[0]
 
 
-while True:
-    Clock.tick(FPS)
+##초기화
 
-    for event in pygame.event.get():
-        # # 게임을 종료시키는 함수
-        if event.type == pygame.QUIT:
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            textoutput("아무고토 못하쥬?")
-            if event.key == pygame.K_ESCAPE:
-                sys.exit()
-            if event.key == pygame.K_RIGHT and Player_posX < 3:
-                Player_posX += 1
-            if event.key == pygame.K_LEFT and Player_posX > 0:
-                Player_posX -= 1
-            if event.key == pygame.K_UP and Player_posY > 0:
-                Player_posY -= 1
-            if event.key == pygame.K_DOWN and Player_posY < 3:
-                Player_posY += 1
+# 룸생성
+rooms = [[], [], [], []]
+for i in range(4):
+    for j in range(4):
+        rooms[i].append(Room(i, j))
 
-    screen.fill(BLACK)
+# 0,0초기화
+rooms[0][0].view = True
 
+# 플레이어 초기화
+player = Player(0, 0)
+
+# 장애물 설정
+rooms[2][2].status = "wumpus"
+rooms[2][3].status = "pit"
+rooms[3][3].status = "gold"
+
+
+def RenderMap(
+    BOXSCALE,
+    FIREPOSITION,
+    screen,
+    map_img,
+    fire_img,
+    fire_img_down,
+    fire_img_left,
+    fire_img_right,
+):
     screen.blit(map_img, (24, 10))
     screen.blit(fire_img, (BOXSCALE + FIREPOSITION, 0))
     screen.blit(fire_img, ((3 * BOXSCALE) + FIREPOSITION, 0))
@@ -126,17 +165,61 @@ while True:
         fire_img_right,
         ((4 * BOXSCALE) + FIREPOSITION * 2, (3 * BOXSCALE) + FIREPOSITION),
     )
-    screen.blit(wumpus_img, (point(2, 2)))
-    screen.blit(wumpus_img, (point(0, 2)))
-    screen.blit(pitch_img, (point(2, 3)))
-    screen.blit(pitch_img2, (point(1, 0)))
-    screen.blit(gold_img, (point(3, 3)))
-    screen.blit(player_img, (point(Player_posX, Player_posY)))
 
-    dark()
+
+while True:
+    Clock.tick(FPS)
+    # 현재위치
+    currentRoom = rooms[player.x][player.y]
+
+    for event in pygame.event.get():
+        # # 게임을 종료시키는 함수
+        if event.type == pygame.QUIT:
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            textoutput("아무고토 못하쥬?")
+            if event.key == pygame.K_ESCAPE:
+                sys.exit()
+            if event.key == pygame.K_RIGHT and player.x < 3:
+                player.x += 1
+            if event.key == pygame.K_LEFT and player.x > 0:
+                player.x -= 1
+            if event.key == pygame.K_UP and player.y > 0:
+                player.y -= 1
+            if event.key == pygame.K_DOWN and player.y < 3:
+                player.y += 1
+            rooms[player.x][player.y].view = True
+
+    screen.fill(BLACK)
+
+    RenderMap(
+        BOXSCALE,
+        FIREPOSITION,
+        screen,
+        map_img,
+        fire_img,
+        fire_img_down,
+        fire_img_left,
+        fire_img_right,
+    )
+
+    for x in range(4):
+        # 룸의 상태에 따라 오브젝트 생성. 변경은 위에서 하면 된다. 여긴 안건드려도 됨
+        for y in range(4):
+            if rooms[x][y].status == "wumpus":
+                screen.blit(wumpus_img, (point(x, y)))
+            elif rooms[x][y].status == "pit":
+                screen.blit(pit_img, (point(2, 3)))
+            elif rooms[x][y].status == "gold":
+                screen.blit(gold_img, (point(3, 3)))
+            # 지나간곳만 보임 (view가 false일떄)
+            if not rooms[x][y].view:
+                screen.blit(dark_img, (point(x, y)))
+    # 플레이어 렌더링
+    screen.blit(player_img, (point(player.x, player.y)))
 
     screen.blit(
-        font.render(str(Player_posX) + "," + str(Player_posY), True, text_color),
+        font.render(str(player.x) + "," + str(player.y), True, text_color),
         (800, 100),
     )
     for text in textArr:
