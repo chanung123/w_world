@@ -3,7 +3,7 @@
 ## Authors
 
 - [@chanung123](https://github.com/chanung123)
-- [@songchez](https://github.com/songchez)
+- [@songchez](https://github.com/songchez)
 
 ## Installation
 
