@@ -1,6 +1,8 @@
 import sys
 import pygame
 from pygame.locals import *
+<<<<<<<<< Temporary merge branch 1
+=========
 import random
 import time
 
@@ -71,6 +73,7 @@ import time
 
 # ------------------------------------
 
+>>>>>>>>> Temporary merge branch 2
 
 # Initialize the game engine
 pygame.init()
@@ -99,10 +102,11 @@ screen = pygame.display.set_mode((1300, 720))
 screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
-map_img = pygame.image.load("map.png")
+# 에셋 불러오기
+map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
-fire_img = pygame.image.load("fire.png")
+fire_img = pygame.image.load("assets/fire.png")
 fire_img = pygame.transform.scale(fire_img, (y, y))
 fire_img_u = pygame.transform.rotate(fire_img, 0)
 fire_img_d = pygame.transform.rotate(fire_img, 180)
@@ -110,40 +114,37 @@ fire_img_l = pygame.transform.rotate(fire_img, 90)
 fire_img_r = pygame.transform.rotate(fire_img, -90)
 
 
-gold_img = pygame.image.load("gold in box.png")
+gold_img = pygame.image.load("assets/gold in box.png")
 gold_img = pygame.transform.scale(gold_img, (y, y))
 
-wumpus_img = pygame.image.load("wumpus.png")
+wumpus_img = pygame.image.load("assets/wumpus.png")
 wumpus_img = pygame.transform.scale(wumpus_img, (y, y))
 
-pitch_img = pygame.image.load("pitch.png")
+pitch_img = pygame.image.load("assets/pitch.png")
 pitch_img = pygame.transform.scale(pitch_img, (y, y))
 
-pitch_img2 = pygame.image.load("pitch_rava.png")
+pitch_img2 = pygame.image.load("assets/pitch_rava.png")
 pitch_img2 = pygame.transform.scale(pitch_img2, (y, y))
 
-player_img = pygame.image.load("player.png")
+player_img = pygame.image.load("assets/player.png")
 player_img = pygame.transform.scale(player_img, (y, y))
 
-dark_img = pygame.image.load("dark.png")
+dark_img = pygame.image.load("assets/dark.png")
 dark_img = pygame.transform.scale(dark_img, (y, y))
 
 player_posX = 0
 player_posY = 0
 
 # def rand_point(x , y):
-    
 
 
 def point(postionX, postionY):
     if postionX >= 0 and postionX <= 3:
         if postionY >= 0 and postionY <= 3:
-            
             return ((postionX * y) + z, ((postionY) * y) + z)
 
     if postionX > 3 or postionY > 3:
         return (((postionX) * y) + z, ((postionY - 1) * y) + z)
-        print("bump")
 
 
 # def light():
@@ -158,6 +159,7 @@ def dark():
 
 text_color = WHITE  # Black
 font = pygame.font.Font(None, 36)
+>>>>>>>>> Temporary merge branch 2
 
 # text_surface = font.render("asdasdasdasd", True, text_color)
 textArr = []
@@ -178,10 +180,13 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
+<<<<<<<<< Temporary merge branch 1
+            textOutput("멍충한 놈~")
+=========
             textOutput("hahahahaha")
+>>>>>>>>> Temporary merge branch 2
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
-                pygame.quit()
             if event.key == pygame.K_RIGHT:
                 player_posX += 1
             if event.key == pygame.K_LEFT:
@@ -235,11 +240,17 @@ while True:
         (800, 100),
     )
     for text in textArr:
+<<<<<<<<< Temporary merge branch 1
+        x = 40 * (textArr.index(text) + 1)
+=========
         x = 20 * (textArr.index(text) + 1)
+>>>>>>>>> Temporary merge branch 2
         screen.blit(text, (800, x + 100))
 
     # # 게임을 종료시키는 함수
     pygame.display.update()
+<<<<<<<<< Temporary merge branch 1
+=========
 
     # ------------------------------------------
 
@@ -274,3 +285,4 @@ while True:
     #         player.shoot_arrow(direction, snetch)
 
     # ------------------------------------------
+>>>>>>>>> Temporary merge branch 2
