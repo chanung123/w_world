@@ -29,26 +29,26 @@ screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
 
-# 에셋 불러오기
-def renderImage(src):
+def renderimg(src):
+    """에셋 불러오기"""
     return pygame.transform.scale(pygame.image.load(src), (boxScale, boxScale))
 
 
 map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
-fire_img = renderImage("assets/fire.png")
+fire_img = renderimg("assets/fire.png")
 fire_img_up = pygame.transform.rotate(fire_img, 0)
 fire_img_down = pygame.transform.rotate(fire_img, 180)
 fire_img_left = pygame.transform.rotate(fire_img, 90)
 fire_img_right = pygame.transform.rotate(fire_img, -90)
 
-gold_img = renderImage("assets/gold in box.png")
-wumpus_img = renderImage("assets/wumpus.png")
-pitch_img = renderImage("assets/pitch.png")
-pitch_img2 = renderImage("assets/pitch_rava.png")
-player_img = renderImage("assets/player.png")
-dark_img = renderImage("assets/dark.png")
+gold_img = renderimg("assets/gold in box.png")
+wumpus_img = renderimg("assets/wumpus.png")
+pitch_img = renderimg("assets/pitch.png")
+pitch_img2 = renderimg("assets/pitch_rava.png")
+player_img = renderimg("assets/player.png")
+dark_img = renderimg("assets/dark.png")
 
 player_posX = 0
 player_posY = 0
