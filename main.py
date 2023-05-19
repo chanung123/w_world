@@ -1,7 +1,6 @@
 import sys
 import pygame
 from pygame.locals import *
-import random
 
 # Initialize the game engine
 pygame.init()
@@ -35,7 +34,7 @@ def point(postionX, postionY):
 
 
 text_color = (0, 0, 0)  # Black
-font = pygame.font.Font("uhBeePuding.ttf", 36)
+font = pygame.font.Font("uhBeePuding.ttf", 26)
 
 # text_surface = font.render("asdasdasdasd", True, text_color)
 
@@ -57,7 +56,7 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            textOutput("gogogoogogogog")
+            textOutput("멍충한 놈~")
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
             if event.key == pygame.K_RIGHT:
@@ -86,7 +85,7 @@ while True:
         (800, 100),
     )
     for text in textArr:
-        x = 20 * (textArr.index(text) + 1)
+        x = 40 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
     # # 게임을 종료시키는 함수
