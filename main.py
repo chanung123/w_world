@@ -38,12 +38,13 @@ class Player:
             print("You don't smell a Wumpus.")
 
     def sense_pit(self, currentroom):
-         """웅덩이 감지"""
-        # TODO: 4가지 방향에 웅덩이가 있을경우 breeze
-        if currentroom.status == "pit":
-            print("You feel a breeze!")
-        else:
-            print("You don't feel a breeze.")
+        """웅덩이 감지"""
+
+    # TODO: 4가지 방향에 웅덩이가 있을경우 breeze
+    # if currentroom.status == "pit":
+    #     print("You feel a breeze!")
+    # else:
+    #     print("You don't feel a breeze.")
 
 
 # Initialize the game engine
