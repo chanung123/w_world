@@ -15,17 +15,6 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-<<<<<<< HEAD
-
-
-## 게임 창 설정 ##
-screen = pygame.display.set_mode((1300, 700))
-screen.fill(WHITE)  # 하얀색으로 배경 채우기
-pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
-
-img = pygame.image.load("player.png")
-img = pygame.transform.scale(img, (150, 150))
-=======
 
 # 격자만들기(가로)
 x = 0  # (0,0)
@@ -68,7 +57,6 @@ player_img = pygame.transform.scale(player_img, (y, y))
 
 dark_img = pygame.image.load("assets/dark.png")
 dark_img = pygame.transform.scale(dark_img, (y, y))
->>>>>>> 92f6e25
 
 player_posX = 0
 player_posY = 0
@@ -77,13 +65,6 @@ player_posY = 0
 
 
 def point(postionX, postionY):
-<<<<<<< HEAD
-    return ((postionX * 150), ((postionY) * 150))
-
-
-text_color = (0, 0, 0)  # Black
-font = pygame.font.Font("uhBeePuding.ttf", 26)
-=======
     if postionX >= 0 and postionX <= 3:
         if postionY >= 0 and postionY <= 3:
             return ((postionX * y) + z, ((postionY) * y) + z)
@@ -104,18 +85,11 @@ def dark():
 
 text_color = WHITE  # Black
 font = pygame.font.Font("uhBeePuding.ttf", 28)
->>>>>>> 92f6e25
 
 # text_surface = font.render("asdasdasdasd", True, text_color)
 textArr = []
 
 
-<<<<<<< HEAD
-textArr = []
-
-
-=======
->>>>>>> 92f6e25
 def textOutput(text):
     text_surface = font.render(text, True, text_color)
     textArr.append(text_surface)
@@ -131,14 +105,9 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-<<<<<<< HEAD
-            textOutput("멍충한 놈~")
-=======
             textOutput("아무고토 못하쥬?")
->>>>>>> 92f6e25
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
-                pygame.quit()
             if event.key == pygame.K_RIGHT:
                 player_posX += 1
             if event.key == pygame.K_LEFT:
@@ -148,19 +117,6 @@ while True:
             if event.key == pygame.K_DOWN:
                 player_posY += 1
 
-<<<<<<< HEAD
-    screen.fill(WHITE)
-
-    # 격자만들기(가로)
-    x = 0  # (0,0)
-    y = 150
-    for i in range(5):
-        pygame.draw.line(screen, BLACK, (x, 0), (x, y * 4), width=3)
-        pygame.draw.line(screen, BLACK, (0, x), (y * 4, x), width=3)
-        x += y
-
-    screen.blit(img, (point(player_posX, player_posY)))
-=======
     screen.fill(BLACK)
 
     screen.blit(map_img, (24, 10))
@@ -199,18 +155,13 @@ while True:
     screen.blit(player_img, (point(player_posX, player_posY)))
 
     dark()
->>>>>>> 92f6e25
 
     screen.blit(
         font.render(str(player_posX) + "," + str(player_posY), True, text_color),
         (800, 100),
     )
     for text in textArr:
-<<<<<<< HEAD
-        x = 40 * (textArr.index(text) + 1)
-=======
         x = 30 * (textArr.index(text) + 1)
->>>>>>> 92f6e25
         screen.blit(text, (800, x + 100))
 
     # # 게임을 종료시키는 함수
