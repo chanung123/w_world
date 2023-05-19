@@ -1,76 +1,6 @@
 import sys
 import pygame
 from pygame.locals import *
-import random
-import time
-
-# ------------------------------------
-
-
-# class Room:
-#     def __init__(self, x, y):
-#         self.x = x
-#         self.y = y
-#         self.status = "saferoom"
-
-
-# class Player:
-#     def __init__(self, x, y):
-#         self.x = x
-#         self.y = y
-#         self.arrows = 2
-
-#     def move(self, dx, dy):
-#         self.x += dx
-#         self.y += dy
-
-#     def shoot_arrow(self, direction, currentroom):
-#         if self.arrows > 0:
-#             self.arrows -= 1
-#             if direction == "w":
-#                 print("나이샷! 웜푸스가 뒤졌습니다!")
-#             else:
-#                 print("어따쏘는거죠? 웜푸스를 놓쳤습니다.")
-
-#     def sense_wumpus(currentroom):
-#         # TODO: 4가지 방향에 웜푸스가 있을경우 snetch
-#         if currentroom.status == "wumpus":
-#             print("You smell a Wumpus!")
-#         else:
-#             print("You don't smell a Wumpus.")
-
-#     def sense_pit(self):
-#         # TODO: 4가지 방향에 웅덩이가 있을경우 breeze
-#         if self.pit and self.x == self.pit.x and self.y == self.pit.y:
-#             print("You feel a breeze!")
-#         else:
-#             print("You don't feel a breeze.")
-
-
-# def main():
-#     # Create the rooms
-#     rooms = [[], [], [], []]
-#     for i in range(4):
-#         for j in range(4):
-#             rooms[i].append(Room(i, j))
-
-#     # 어디위치에 있는지 설정하기.
-#     rooms[2][2].status = "wumpus"
-#     rooms[2][3].status = "pit"
-#     rooms[3][3].status = "gold"
-
-#     # Create the player
-#     player = Player(0, 0)
-
-#     print(rooms)
-
-
-# if __name__ == "__main__":
-#     main()
-
-
-# ------------------------------------
-
 
 # Initialize the game engine
 pygame.init()
@@ -99,10 +29,11 @@ screen = pygame.display.set_mode((1300, 720))
 screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
-map_img = pygame.image.load("map.png")
+# 에셋 불러오기
+map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
-fire_img = pygame.image.load("fire.png")
+fire_img = pygame.image.load("assets/fire.png")
 fire_img = pygame.transform.scale(fire_img, (y, y))
 fire_img_u = pygame.transform.rotate(fire_img, 0)
 fire_img_d = pygame.transform.rotate(fire_img, 180)
@@ -110,40 +41,37 @@ fire_img_l = pygame.transform.rotate(fire_img, 90)
 fire_img_r = pygame.transform.rotate(fire_img, -90)
 
 
-gold_img = pygame.image.load("gold in box.png")
+gold_img = pygame.image.load("assets/gold in box.png")
 gold_img = pygame.transform.scale(gold_img, (y, y))
 
-wumpus_img = pygame.image.load("wumpus.png")
+wumpus_img = pygame.image.load("assets/wumpus.png")
 wumpus_img = pygame.transform.scale(wumpus_img, (y, y))
 
-pitch_img = pygame.image.load("pitch.png")
+pitch_img = pygame.image.load("assets/pitch.png")
 pitch_img = pygame.transform.scale(pitch_img, (y, y))
 
-pitch_img2 = pygame.image.load("pitch_rava.png")
+pitch_img2 = pygame.image.load("assets/pitch_rava.png")
 pitch_img2 = pygame.transform.scale(pitch_img2, (y, y))
 
-player_img = pygame.image.load("player.png")
+player_img = pygame.image.load("assets/player.png")
 player_img = pygame.transform.scale(player_img, (y, y))
 
-dark_img = pygame.image.load("dark.png")
+dark_img = pygame.image.load("assets/dark.png")
 dark_img = pygame.transform.scale(dark_img, (y, y))
 
 player_posX = 0
 player_posY = 0
 
 # def rand_point(x , y):
-    
 
 
 def point(postionX, postionY):
     if postionX >= 0 and postionX <= 3:
         if postionY >= 0 and postionY <= 3:
-            
             return ((postionX * y) + z, ((postionY) * y) + z)
 
     if postionX > 3 or postionY > 3:
         return (((postionX) * y) + z, ((postionY - 1) * y) + z)
-        print("bump")
 
 
 # def light():
@@ -157,7 +85,7 @@ def dark():
 
 
 text_color = WHITE  # Black
-font = pygame.font.Font(None, 36)
+font = pygame.font.Font("uhBeePuding.ttf", 28)
 
 # text_surface = font.render("asdasdasdasd", True, text_color)
 textArr = []
@@ -178,7 +106,7 @@ while True:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            textOutput("hahahahaha")
+            textOutput("아무고토 못하쥬?")
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
                 pygame.quit()
@@ -235,42 +163,8 @@ while True:
         (800, 100),
     )
     for text in textArr:
-        x = 20 * (textArr.index(text) + 1)
+        x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
     # # 게임을 종료시키는 함수
     pygame.display.update()
-
-    # ------------------------------------------
-
-    # # Print the player's location
-    # currentRoom = rooms[player.x][player.y]
-    # # TODO: Gameover
-    # if currentRoom.status == "wumpus":
-    #     print("으악! 웜푸스한테 잡아먹혔습니다. YOU DIE")
-    # elif currentRoom.status == "pit":
-    #     print("읍...웅덩이에 빠져죽었습니다. YOU DIE")
-    # # Check if the player has won or lost
-    # elif currentRoom.status == "gold":
-    #     print("이겼다!")
-    #     break
-
-    # print("현재위치 {}.".format((player.x, player.y)))
-
-    # # Let the player sense the Wumpus and the pit
-    # snetch = player.sense_wumpus(currentRoom, rooms)
-    # breeze = player.sense_pit(currentRoom)
-    # if snetch:
-    #     print("웜푸스 냄새가 납니다.")
-    # if breeze:
-    #     print("바람소리가 들립니다.")
-
-    # # 화살쏘기
-    # if player.arrows > 0:
-    #     shoot = input("화살쏠거? (y/n): ")
-    #     if shoot == "y":
-    #         # TODO: 화살을 어디로 쏠거냐???
-    #         direction = int(input("어디로 쏠래? (w,a,s,d)"))
-    #         player.shoot_arrow(direction, snetch)
-
-    # ------------------------------------------
