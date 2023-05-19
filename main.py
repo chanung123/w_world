@@ -18,7 +18,7 @@ WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 x = 0  # (0,0)
-y = 130
+boxScale = 130
 z = 100
 r = 35
 
@@ -28,54 +28,44 @@ screen = pygame.display.set_mode((1300, 720))
 screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
+
 # 에셋 불러오기
+class renderImage:
+    def __init__(self, src):
+        self.img = pygame.transform.scale(pygame.image.load(src), (boxScale, boxScale))
+
+
 map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
-fire_img = pygame.image.load("assets/fire.png")
-fire_img = pygame.transform.scale(fire_img, (y, y))
-fire_img_u = pygame.transform.rotate(fire_img, 0)
-fire_img_d = pygame.transform.rotate(fire_img, 180)
-fire_img_l = pygame.transform.rotate(fire_img, 90)
-fire_img_r = pygame.transform.rotate(fire_img, -90)
+fire_img = renderImage("assets/fire.png").img
+fire_img_up = pygame.transform.rotate(fire_img, 0)
+fire_img_down = pygame.transform.rotate(fire_img, 180)
+fire_img_left = pygame.transform.rotate(fire_img, 90)
+fire_img_right = pygame.transform.rotate(fire_img, -90)
 
-
-gold_img = pygame.image.load("assets/gold in box.png")
-gold_img = pygame.transform.scale(gold_img, (y, y))
-
-wumpus_img = pygame.image.load("assets/wumpus.png")
-wumpus_img = pygame.transform.scale(wumpus_img, (y, y))
-
-pitch_img = pygame.image.load("assets/pitch.png")
-pitch_img = pygame.transform.scale(pitch_img, (y, y))
-
-pitch_img2 = pygame.image.load("assets/pitch_rava.png")
-pitch_img2 = pygame.transform.scale(pitch_img2, (y, y))
-
-player_img = pygame.image.load("assets/player.png")
-player_img = pygame.transform.scale(player_img, (y, y))
-
-dark_img = pygame.image.load("assets/dark.png")
-dark_img = pygame.transform.scale(dark_img, (y, y))
+gold_img = renderImage("assets/gold in box.png").img
+wumpus_img = renderImage("assets/wumpus.png").img
+pitch_img = renderImage("assets/pitch.png").img
+pitch_img2 = renderImage("assets/pitch_rava.png").img
+player_img = renderImage("assets/player.png").img
+dark_img = renderImage("assets/dark.png").img
 
 player_posX = 0
 player_posY = 0
 
-# def rand_point(x , y):
 
-
+# 플레이어 포지션 정하기
 def point(postionX, postionY):
     if postionX >= 0 and postionX <= 3:
         if postionY >= 0 and postionY <= 3:
-            return ((postionX * y) + z, ((postionY) * y) + z)
+            return ((postionX * boxScale) + z, ((postionY) * boxScale) + z)
 
     if postionX > 3 or postionY > 3:
-        return (((postionX) * y) + z, ((postionY - 1) * y) + z)
+        return (((postionX) * boxScale) + z, ((postionY - 1) * boxScale) + z)
 
 
-# def light():
-
-
+# 검은화면으로 가리기
 def dark():
     for i in range(4):
         for j in range(4):
@@ -101,8 +91,8 @@ while True:
     Clock.tick(FPS)
 
     for event in pygame.event.get():
+        # # 게임을 종료시키는 함수
         if event.type == QUIT:
-            pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
             textOutput("아무고토 못하쥬?")
@@ -120,38 +110,19 @@ while True:
     screen.fill(BLACK)
 
     screen.blit(map_img, (24, 10))
-
-    screen.blit(fire_img, (y + r, 0))
-    screen.blit(fire_img, ((3 * y) + r, 0))
-
-    screen.blit(fire_img_d, (y + r, y * 4 + r * 2))
-    screen.blit(fire_img_d, ((3 * y) + 35, y * 4 + r * 2))
-
-    screen.blit(fire_img_l, (0, y + r))
-    screen.blit(fire_img_l, (0, (3 * y) + r))
-
-    screen.blit(fire_img_r, ((4 * y) + r * 2, y + r))
-    screen.blit(fire_img_r, ((4 * y) + r * 2, (3 * y) + r))
-
+    screen.blit(fire_img, (boxScale + r, 0))
+    screen.blit(fire_img, ((3 * boxScale) + r, 0))
+    screen.blit(fire_img_d, (boxScale + r, boxScale * 4 + r * 2))
+    screen.blit(fire_img_d, ((3 * boxScale) + 35, boxScale * 4 + r * 2))
+    screen.blit(fire_img_l, (0, boxScale + r))
+    screen.blit(fire_img_l, (0, (3 * boxScale) + r))
+    screen.blit(fire_img_r, ((4 * boxScale) + r * 2, boxScale + r))
+    screen.blit(fire_img_r, ((4 * boxScale) + r * 2, (3 * boxScale) + r))
     screen.blit(wumpus_img, (point(2, 2)))
-
     screen.blit(wumpus_img, (point(0, 2)))
-
     screen.blit(pitch_img, (point(2, 3)))
-
     screen.blit(pitch_img2, (point(1, 0)))
-
     screen.blit(gold_img, (point(3, 3)))
-    # 격자만들기(가로)
-    x = 0  # (0,0)
-    y = 130
-    z = 100
-
-    for i in range(5):
-        pygame.draw.line(screen, BLACK, (x + z, 0 + z), (x + z, (y * 4) + z), width=3)
-        pygame.draw.line(screen, BLACK, (0 + z, x + z), ((y * 4) + z, x + z), width=3)
-        x += y
-
     screen.blit(player_img, (point(player_posX, player_posY)))
 
     dark()
@@ -164,5 +135,4 @@ while True:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
-    # # 게임을 종료시키는 함수
     pygame.display.update()
