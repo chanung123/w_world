@@ -19,7 +19,7 @@ WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 x = 0  # (0,0)
-boxScale = 130
+BOXSCALE = 130
 z = 100
 r = 35
 
@@ -31,7 +31,7 @@ pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
 def renderimg(src):
     """에셋 불러오기"""
-    return pygame.transform.scale(pygame.image.load(src), (boxScale, boxScale))
+    return pygame.transform.scale(pygame.image.load(src), (BOXSCALE, BOXSCALE))
 
 
 map_img = pygame.image.load("assets/map.png")
@@ -50,25 +50,26 @@ pitch_img2 = renderimg("assets/pitch_rava.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
 
-player_posX = 0
-player_posY = 0
+# pylint: disable=C0103
+Player_posX = 0
+Player_posY = 0
 
 
 def point(postionx, postiony):
     """플레이어 포지션 정하기"""
     if postionx >= 0 and postionx <= 3:
         if postiony >= 0 and postiony <= 3:
-            return ((postionx * boxScale) + z, ((postiony) * boxScale) + z)
+            return ((postionx * BOXSCALE) + z, ((postiony) * BOXSCALE) + z)
 
     if postionx > 3 or postiony > 3:
-        return (((postionx) * boxScale) + z, ((postiony - 1) * boxScale) + z)
+        return (((postionx) * BOXSCALE) + z, ((postiony - 1) * BOXSCALE) + z)
 
 
 def dark():
     """검은화면으로 가리기"""
     for i in range(4):
         for j in range(4):
-            if i != player_posX or j != player_posY:
+            if i != Player_posX or j != Player_posY:
                 screen.blit(dark_img, (point(i, j)))
 
 
@@ -98,37 +99,37 @@ while True:
             textoutput("아무고토 못하쥬?")
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
-            if event.key == pygame.K_RIGHT and player_posX < 3:
-                player_posX += 1
-            if event.key == pygame.K_LEFT and player_posX > 0:
-                player_posX -= 1
-            if event.key == pygame.K_UP and player_posY > 0:
-                player_posY -= 1
-            if event.key == pygame.K_DOWN and player_posY < 3:
-                player_posY += 1
+            if event.key == pygame.K_RIGHT and Player_posX < 3:
+                Player_posX += 1
+            if event.key == pygame.K_LEFT and Player_posX > 0:
+                Player_posX -= 1
+            if event.key == pygame.K_UP and Player_posY > 0:
+                Player_posY -= 1
+            if event.key == pygame.K_DOWN and Player_posY < 3:
+                Player_posY += 1
 
     screen.fill(BLACK)
 
     screen.blit(map_img, (24, 10))
-    screen.blit(fire_img, (boxScale + r, 0))
-    screen.blit(fire_img, ((3 * boxScale) + r, 0))
-    screen.blit(fire_img_down, (boxScale + r, boxScale * 4 + r * 2))
-    screen.blit(fire_img_down, ((3 * boxScale) + 35, boxScale * 4 + r * 2))
-    screen.blit(fire_img_left, (0, boxScale + r))
-    screen.blit(fire_img_left, (0, (3 * boxScale) + r))
-    screen.blit(fire_img_right, ((4 * boxScale) + r * 2, boxScale + r))
-    screen.blit(fire_img_right, ((4 * boxScale) + r * 2, (3 * boxScale) + r))
+    screen.blit(fire_img, (BOXSCALE + r, 0))
+    screen.blit(fire_img, ((3 * BOXSCALE) + r, 0))
+    screen.blit(fire_img_down, (BOXSCALE + r, BOXSCALE * 4 + r * 2))
+    screen.blit(fire_img_down, ((3 * BOXSCALE) + 35, BOXSCALE * 4 + r * 2))
+    screen.blit(fire_img_left, (0, BOXSCALE + r))
+    screen.blit(fire_img_left, (0, (3 * BOXSCALE) + r))
+    screen.blit(fire_img_right, ((4 * BOXSCALE) + r * 2, BOXSCALE + r))
+    screen.blit(fire_img_right, ((4 * BOXSCALE) + r * 2, (3 * BOXSCALE) + r))
     screen.blit(wumpus_img, (point(2, 2)))
     screen.blit(wumpus_img, (point(0, 2)))
     screen.blit(pitch_img, (point(2, 3)))
     screen.blit(pitch_img2, (point(1, 0)))
     screen.blit(gold_img, (point(3, 3)))
-    screen.blit(player_img, (point(player_posX, player_posY)))
+    screen.blit(player_img, (point(Player_posX, Player_posY)))
 
     dark()
 
     screen.blit(
-        font.render(str(player_posX) + "," + str(player_posY), True, text_color),
+        font.render(str(Player_posX) + "," + str(Player_posY), True, text_color),
         (800, 100),
     )
     for text in textArr:
