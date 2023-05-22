@@ -135,7 +135,6 @@ fire_img_right = pygame.transform.rotate(fire_img, -90)
 gold_img = renderimg("assets/gold in box.png")
 wumpus_img = renderimg("assets/wumpus.png")
 pit_img = renderimg("assets/pitch_rava.png")
-pit_img2 = renderimg("assets\pitch.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
 
