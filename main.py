@@ -1,52 +1,8 @@
 # pylint: disable=C0114
 import sys
 import pygame
-
-
-class Room:
-    """방"""
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.status = "saferoom"
-        self.view = False
-        
-
-
-class Player:
-    """플레이어"""
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.arrows = 2
-
-    def shoot_arrow(self, direction, currentroom):
-        if self.arrows > 0:
-            self.arrows -= 1
-            if direction == "w":
-                print("나이샷! 웜푸스가 뒤졌습니다!")
-            else:
-                print("어따쏘는거죠? 웜푸스를 놓쳤습니다.")
-
-    def sense_wumpus(self, currentroom):
-        """웜푸스 감지"""
-        # TODO: 4가지 방향에 웜푸스가 있을경우 snetch
-        if currentroom.status == "wumpus":
-            print("You smell a Wumpus!")
-        else:
-            print("You don't smell a Wumpus.")
-
-    def sense_pit(self, currentroom):
-        """웅덩이 감지"""
-
-    # TODO: 4가지 방향에 웅덩이가 있을경우 breeze
-    # if currentroom.status == "pit":
-    #     print("You feel a breeze!")
-    # else:
-    #     print("You don't feel a breeze.")
-
+from classes.Player import Player
+from classes.Room import Room
 
 # Initialize the game engine
 # pylint: disable=no-member
@@ -69,8 +25,6 @@ BOXSCALE = 130
 MARGIN = 100
 FIREPOSITION = 35
 FRAMSCALE = 265
-MOVE = False
-CLICK = False
 
 MX = 0
 MY = 0
@@ -79,40 +33,6 @@ ROW_COUNT = 4
 MOUS_X = 0
 MOUS_Y = 0
 
-column_index1 = 0
-row_index1 = 0
-column_index2 = 0
-row_index2 = 0
-
-frame_img = pygame.image.load("assets/frame.png")
-frame_img = pygame.transform.scale(frame_img, (FRAMSCALE, FRAMSCALE))
-frame_img_Rect = frame_img.get_rect()
-
-#마우스 격자
-def mouse_pos_x(pos_x):
-    if pos_x >= MARGIN and pos_x < MARGIN + BOXSCALE:
-        return 0
-    if pos_x >= MARGIN + BOXSCALE and pos_x < MARGIN + (BOXSCALE*2):
-        return 1
-    if pos_x >= MARGIN + (BOXSCALE*2) and pos_x < MARGIN + (BOXSCALE*3):
-        return 2
-    if pos_x >= MARGIN + (BOXSCALE*3) and pos_x < MARGIN + (BOXSCALE*4):
-        return 3
-    else:
-        return 0
-
-def mouse_pos_y(pos_y):
-    if pos_y >= MARGIN and pos_y < MARGIN + BOXSCALE:
-        return 0
-    if pos_y >= MARGIN + BOXSCALE and pos_y < MARGIN + (BOXSCALE*2):
-        return 1
-    if pos_y >= MARGIN + (BOXSCALE*2) and pos_y < MARGIN + (BOXSCALE*3):
-        return 2
-    if pos_y >= MARGIN + (BOXSCALE*3) and pos_y < MARGIN + (BOXSCALE*4):
-        return 3
-    else:
-        return 0
-    
 
 def M_icon(click):
     if click == 0:
@@ -121,7 +41,6 @@ def M_icon(click):
     if click == 1:
         # x표시
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
-        
 
 
 ## 게임 창 설정 ##
@@ -130,10 +49,11 @@ screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
 
-def renderimg(src):
+def renderimg(src, rscale=BOXSCALE):
     """에셋 불러오기"""
-    return pygame.transform.scale(pygame.image.load(src), (BOXSCALE, BOXSCALE))
+    return pygame.transform.scale(pygame.image.load(src), (rscale, rscale))
 
+frame_img = renderimg("assets/frame.png",FRAMSCALE)
 
 map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
@@ -177,6 +97,31 @@ def point_core(postionx, postiony, box_scale, scale):
             return ((postionx * BOXSCALE) + MARGIN + (box_scale-scale)/2, ((postiony-1) * BOXSCALE) + MARGIN + (box_scale-scale)/2)
             
 
+#마우스 격자
+def mouse_pos_x(pos_x):
+    if pos_x >= MARGIN and pos_x < MARGIN + BOXSCALE:
+        return 0
+    if pos_x >= MARGIN + BOXSCALE and pos_x < MARGIN + (BOXSCALE*2):
+        return 1
+    if pos_x >= MARGIN + (BOXSCALE*2) and pos_x < MARGIN + (BOXSCALE*3):
+        return 2
+    if pos_x >= MARGIN + (BOXSCALE*3) and pos_x < MARGIN + (BOXSCALE*4):
+        return 3
+    else:
+        return 0
+
+def mouse_pos_y(pos_y):
+    if pos_y >= MARGIN and pos_y < MARGIN + BOXSCALE:
+        return 0
+    if pos_y >= MARGIN + BOXSCALE and pos_y < MARGIN + (BOXSCALE*2):
+        return 1
+    if pos_y >= MARGIN + (BOXSCALE*2) and pos_y < MARGIN + (BOXSCALE*3):
+        return 2
+    if pos_y >= MARGIN + (BOXSCALE*3) and pos_y < MARGIN + (BOXSCALE*4):
+        return 3
+    else:
+        return 0
+
 def point(postionx, postiony):
     """플레이어 포지션 정하기"""
     if postionx >= 0 and postionx <= 3:
@@ -189,10 +134,7 @@ def point(postionx, postiony):
 
 text_color = WHITE  # Black
 font = pygame.font.Font("uhBeePuding.ttf", 28)
-
-# text_surface = font.render("asdasdasdasd", True, text_color)
 textArr = []
-
 
 def textoutput(outtext):
     """텍스트 출력해주는 함수"""
@@ -200,7 +142,6 @@ def textoutput(outtext):
     textArr.append(text_surface)
     if len(textArr) > 10:
         del textArr[0]
-
 
 ##초기화
 
@@ -247,80 +188,36 @@ while True:
     Clock.tick(FPS)
     # 현재위치
     currentRoom = rooms[player.x][player.y]
-    
+
     for event in pygame.event.get():
         # # 게임을 종료시키는 함수
         if event.type == pygame.QUIT:
             sys.exit()
-        if event.type == pygame.KEYDOWN:
-            textoutput("키보드 이동")
-            if event.key == pygame.K_ESCAPE:
-                sys.exit()
-            if event.key == pygame.K_RIGHT and player.x < 3:
-                player.x += 1
-            if event.key == pygame.K_LEFT and player.x > 0:
-                player.x -= 1
-            if event.key == pygame.K_UP and player.y > 0:
-                player.y -= 1
-            if event.key == pygame.K_DOWN and player.y < 3:
-                player.y += 1
-            rooms[player.x][player.y].view = True
-
-            # 마우스 버튼이 눌렸을 때
+        #캐릭터 이동
         if event.type == pygame.MOUSEBUTTONDOWN:
-                x1, y1 = event.pos
-
-                column_index1 = mouse_pos_x(x1)
-                row_index1 = mouse_pos_y(y1)
-
-                rooms[column_index1][row_index1].view =True
-
-                screen.blit(frame_img, (point_core(column_index1, row_index1, BOXSCALE, FRAMSCALE)))
-
-                CLICK = not CLICK
-                MOVE = True
-            
-                M_icon(CLICK)
-               
-                player.x = column_index1
-                player.y = row_index1
-
+            x1, y1 = event.pos
+            if rooms[mouse_pos_x(x1)][mouse_pos_y(y1)].canmove:
+                player.x = mouse_pos_x(x1)
+                player.y = mouse_pos_y(y1)
                 textoutput("마우스 이동")
-
-                
-
-            # if CLICK == 0:
-            #     x2, y2 = event.pos
-
-            #     column_index2 = mouse_pos_x(x2)
-            #     row_index2 = mouse_pos_y(y2)
-
-            #     screen.blit(frame_img, (point_core(column_index2, row_index2, BOXSCALE, FRAMSCALE)))
-
-            #     CLICK = not CLICK
-            #     MOVE = True
-            
-            #     M_icon(CLICK)
-                
-            #     player.x = column_index2
-            #     player.y = row_index2
-
-
-
-        # # 마우스 버튼이 올라갔을 때
-        # if event.type == pygame.MOUSEBUTTONUP:
-        # # Image가 이동하면 안되므로 MOVE는 False로
-        #     MOVE = False
-
-        #     # 마우스 커서의 모양을 기본값인 화살표 모양으로 변경
-        #     M_icon(CLICK)
-        #     # pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
-
-           
-
+                rooms[player.x][player.y].view = True
         
-                                    
+        # if event.type == pygame.KEYDOWN:
+        #     textoutput("키보드 이동")
+        #     if event.key == pygame.K_ESCAPE:
+        #         sys.exit()
+        #     if event.key == pygame.K_RIGHT and player.x < 3:
+        #         player.x += 1
+        #     if event.key == pygame.K_LEFT and player.x > 0:
+        #         player.x -= 1
+        #     if event.key == pygame.K_UP and player.y > 0:
+        #         player.y -= 1
+        #     if event.key == pygame.K_DOWN and player.y < 3:
+        #         player.y += 1
+        #         # 이동(마우스 버튼)
+        #     rooms[player.x][player.y].view = True
+
+
 
     screen.fill(BLACK)
 
@@ -347,29 +244,24 @@ while True:
             # 지나간곳만 보임 (view가 false일떄)
             if not rooms[x][y].view:
                 screen.blit(dark_img, (point(x, y)))
-              
 
-    
-    screen.blit(frame_img, (point_core(column_index1, row_index1, BOXSCALE, FRAMSCALE)))
+    #이동할 수 있는 곳 밝은 프레임으로 감싸기
+    framePos = [-1,0],[1,0],[0,-1],[0,1]
+    for pos_box in framePos:
+        x = player.x+pos_box[0]
+        y = player.y+pos_box[1]
+        if (0 <= x <= 3) and (0 <= y <= 3):
+            x1, y1 = pygame.mouse.get_pos()
+            rooms[mouse_pos_x(x1)][mouse_pos_y(y1)].canmove = False
+            if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
+                rooms[x][y].canmove = True
+                screen.blit(frame_img, (point_core(x, y, BOXSCALE, FRAMSCALE)))
 
-    if CLICK:
-        # 플레이어 렌더링
-        screen.blit(player_img, (point(player.x, player.y)))
-
-        
-    
     # 플레이어 렌더링
     screen.blit(player_img, (point(player.x, player.y)))
 
-    x1, y1 = pygame.mouse.get_pos()
-    column_index1 = mouse_pos_x(x1)
-    row_index1 = mouse_pos_y(y1)
-    screen.blit(frame_img, (point_core(column_index1, row_index1, BOXSCALE, FRAMSCALE)))
-
-
     screen.blit(font.render(str(player.x) + "," + str(player.y), True, text_color),(800, 100))
 
-    
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
