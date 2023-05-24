@@ -254,7 +254,7 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit()
         if event.type == pygame.KEYDOWN:
-            textoutput("아무고토 못하쥬?")
+            textoutput("키보드 이동")
             if event.key == pygame.K_ESCAPE:
                 sys.exit()
             if event.key == pygame.K_RIGHT and player.x < 3:
@@ -286,6 +286,8 @@ while True:
                 player.x = column_index1
                 player.y = row_index1
 
+                textoutput("마우스 이동")
+
                 
 
             # if CLICK == 0:
@@ -306,14 +308,14 @@ while True:
 
 
 
-        # 마우스 버튼이 올라갔을 때
-        if event.type == pygame.MOUSEBUTTONUP:
-        # Image가 이동하면 안되므로 MOVE는 False로
-            MOVE = False
+        # # 마우스 버튼이 올라갔을 때
+        # if event.type == pygame.MOUSEBUTTONUP:
+        # # Image가 이동하면 안되므로 MOVE는 False로
+        #     MOVE = False
 
-            # 마우스 커서의 모양을 기본값인 화살표 모양으로 변경
-            M_icon(CLICK)
-            # pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        #     # 마우스 커서의 모양을 기본값인 화살표 모양으로 변경
+        #     M_icon(CLICK)
+        #     # pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
 
            
