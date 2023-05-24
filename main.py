@@ -19,25 +19,19 @@ WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 EDGE = 0  # (0,0)
-
 FIREPOSITION = 35
 FRAMSCALE = 265
 
 def cursoricon(cursor):
     """칸에 커서올라가면 마우스 변경"""
-    if cursor:
-        # 마우스 커서 on
+    if cursor:# 마우스 커서 on
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
-    else:
-        # 마우스 커서 off
+    else:# 마우스 커서 off
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
-
 
 ## 게임 창 설정 ##
 screen = pygame.display.set_mode((1300, 720))
-screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
-
 
 def renderimg(src, rscale=BOXSCALE):
     """에셋 불러오기"""
@@ -91,6 +85,8 @@ rooms[2][3].status = "pit"
 rooms[3][3].status = "gold"
 
 
+
+#인게임
 while True:
     Clock.tick(FPS)
     # 현재위치
