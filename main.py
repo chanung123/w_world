@@ -19,7 +19,7 @@ WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 EDGE = 0  # (0,0)
-FIREPOSITION = 35
+
 FRAMSCALE = 265
 
 def cursoricon(cursor):
@@ -84,8 +84,6 @@ rooms[2][2].status = "wumpus"
 rooms[2][3].status = "pit"
 rooms[3][3].status = "gold"
 
-
-
 #인게임
 while True:
     Clock.tick(FPS)
@@ -107,12 +105,9 @@ while True:
                 textoutput("마우스 이동")
                 rooms[player.x][player.y].view = True
 
-
+#맵 렌더링 background, toach, object(status), view
     screen.fill(BLACK)
-
     RenderMap(
-        BOXSCALE,
-        FIREPOSITION,
         screen,
         map_img,
         fire_img,
@@ -120,7 +115,6 @@ while True:
         fire_img_left,
         fire_img_right,
     )
-
     for x in range(4):
         # 룸의 상태에 따라 오브젝트 생성. 변경은 위에서 하면 된다. 여긴 안건드려도 됨
         for y in range(4):

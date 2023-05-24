@@ -1,4 +1,5 @@
 
+FIREPOSITION = 35
 BOXSCALE = 130
 MARGIN = 100
 
@@ -59,8 +60,6 @@ def point(postionx, postiony):
         return (((postionx) * BOXSCALE) + MARGIN, ((postiony - 1) * BOXSCALE) + MARGIN)
 
 def RenderMap(
-    BOXSCALE,
-    FIREPOSITION,
     screen,
     map_img,
     fire_img,
