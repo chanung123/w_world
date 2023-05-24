@@ -195,23 +195,7 @@ while True:
                 player.x = x
                 player.y = y
                 textoutput("마우스 이동")
-
                 rooms[player.x][player.y].view = True
-        
-        # if event.type == pygame.KEYDOWN:
-        #     textoutput("키보드 이동")
-        #     if event.key == pygame.K_ESCAPE:
-        #         sys.exit()
-        #     if event.key == pygame.K_RIGHT and player.x < 3:
-        #         player.x += 1
-        #     if event.key == pygame.K_LEFT and player.x > 0:
-        #         player.x -= 1
-        #     if event.key == pygame.K_UP and player.y > 0:
-        #         player.y -= 1
-        #     if event.key == pygame.K_DOWN and player.y < 3:
-        #         player.y += 1
-        #         # 이동(마우스 버튼)
-        #     rooms[player.x][player.y].view = True
 
 
 
