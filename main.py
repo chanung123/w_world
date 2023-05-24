@@ -26,14 +26,6 @@ MARGIN = 100
 FIREPOSITION = 35
 FRAMSCALE = 265
 
-MX = 0
-MY = 0
-COLUMN_COUNT = 4
-ROW_COUNT = 4
-MOUS_X = 0
-MOUS_Y = 0
-
-
 def M_icon(click):
     if click == 0:
         # 마우스 커서 기본
@@ -147,8 +139,8 @@ def textoutput(outtext):
 
 # 룸생성
 rooms = [[], [], [], []]
-for i in range(COLUMN_COUNT):
-    for j in range(ROW_COUNT):
+for i in range(4):
+    for j in range(4):
         rooms[i].append(Room(i, j))
 
 # 0,0초기화
@@ -196,10 +188,14 @@ while True:
         #캐릭터 이동
         if event.type == pygame.MOUSEBUTTONDOWN:
             x1, y1 = event.pos
-            if rooms[mouse_pos_x(x1)][mouse_pos_y(y1)].canmove:
-                player.x = mouse_pos_x(x1)
-                player.y = mouse_pos_y(y1)
+            x = mouse_pos_x(x1)
+            y = mouse_pos_y(y1)
+            if rooms[x][y].canmove:
+                rooms[x][y].canmove = False
+                player.x = x
+                player.y = y
                 textoutput("마우스 이동")
+
                 rooms[player.x][player.y].view = True
         
         # if event.type == pygame.KEYDOWN:
@@ -252,14 +248,12 @@ while True:
         y = player.y+pos_box[1]
         if (0 <= x <= 3) and (0 <= y <= 3):
             x1, y1 = pygame.mouse.get_pos()
-            rooms[mouse_pos_x(x1)][mouse_pos_y(y1)].canmove = False
             if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
                 rooms[x][y].canmove = True
                 screen.blit(frame_img, (point_core(x, y, BOXSCALE, FRAMSCALE)))
 
     # 플레이어 렌더링
     screen.blit(player_img, (point(player.x, player.y)))
-
     screen.blit(font.render(str(player.x) + "," + str(player.y), True, text_color),(800, 100))
 
     for text in textArr:
