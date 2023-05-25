@@ -76,4 +76,3 @@ def RenderMap(
     screen.blit(fire_img_left, (0, (3 * BOXSCALE) + FIREPOSITION))
     screen.blit(fire_img_right, ((4 * BOXSCALE) + FIREPOSITION * 2, BOXSCALE + FIREPOSITION))
     screen.blit(fire_img_right,((4 * BOXSCALE) + FIREPOSITION * 2, (3 * BOXSCALE) + FIREPOSITION),)
-
