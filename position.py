@@ -20,19 +20,6 @@ def point_core(pos_x, pos_y, box_scale, scale):
                 (pos_x * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
                 ((pos_y) * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
             )
-    if pos_x > 3 or pos_y > 3:
-        if box_scale < scale:
-            return (
-                (pos_x * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
-                ((pos_y - 1) * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
-            )
-        if box_scale == scale:
-            return (((pos_x) * BOXSCALE) + MARGIN, ((pos_y - 1) * BOXSCALE) + MARGIN)
-        if box_scale > scale:
-            return (
-                (pos_x * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
-                ((pos_y - 1) * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
-            )
 
 
 # 마우스 격자

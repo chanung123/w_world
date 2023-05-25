@@ -19,7 +19,6 @@ WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 EDGE = 0  # (0,0)
-
 FRAMSCALE = 265
 
 
@@ -109,7 +108,6 @@ while True:
                 rooms[X][Y].canmove = False
                 player.x = X
                 player.y = Y
-                textoutput("마우스 이동")
                 rooms[player.x][player.y].view = True
 
     # 맵 렌더링 background, toach, object(status), view
