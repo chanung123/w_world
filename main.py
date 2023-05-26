@@ -112,15 +112,18 @@ for i in range(0, fireball_spritesheet.get_width(), sprite_width):
     sprite_image.blit(fireball_spritesheet, (0, 0), sprite_rect)
     fireball_images.append(sprite_image)
 
-fireball = Fireball((320, 240), (10, 0), fireball_images)
+fireball = Fireball((0, 0), (10, 10), fireball_images)
+
 
 # 스프라이트 그룹 생성
 all_sprites = pygame.sprite.Group()
 all_sprites.add(fireball)
 
+player_rect = player_img.get_rect()
 
 # 인게임
 while True:
+    
     Clock.tick(FPS)
     # 현재위치
     currentRoom = rooms[player.x][player.y]
@@ -150,9 +153,7 @@ while True:
                 Y = mouse_pos_y(y1)
                 SPEED = 0.05
                 vel = (x1 * SPEED, y1 * SPEED)
-                fireball = Fireball(
-                    (point(player.x + 0.5, player.y + 0.5)), vel, fireball_images
-                )
+                fireball = Fireball((point(player.x + 0.5, player.y + 0.5)), (X,Y), fireball_images)
                 all_sprites.add(fireball)
                 if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                     # 애니메이션
@@ -212,5 +213,7 @@ while True:
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
+
+    print()
 
     pygame.display.update()
