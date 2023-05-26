@@ -94,30 +94,62 @@ rooms[3][3].status = "gold"
 # 파이어볼
 
 # Spritesheet 이미지 로드
-fireball_spritesheet = pygame.image.load(
-    os.path.join("assets", "sprites", "FireBall_64x64.png")
-)
+fireball_spritesheet_down = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_down.png"))
+fireball_spritesheet_up = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_up.png"))
+fireball_spritesheet_left = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_left.png"))
+fireball_spritesheet_right = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_right.png"))
+
 
 # fireball 추출된 sprite 이미지 담을 리스트
-fireball_images = []
+fireball_images_up = []
+fireball_images_down = []
+fireball_images_left = []
+fireball_images_right = []
 
-# 추출할 각각의 sprite 이미지 크기
+
+# 추출할 각각의 sprite 이미지 크기 
 sprite_width = 64
 sprite_height = 64
 
-for i in range(0, fireball_spritesheet.get_width(), sprite_width):
+for i in range(0, fireball_spritesheet_up.get_width(), sprite_width):
     # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
     sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
     sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
-    sprite_image.blit(fireball_spritesheet, (0, 0), sprite_rect)
-    fireball_images.append(sprite_image)
+    sprite_image.blit(fireball_spritesheet_up, (0, 0), sprite_rect)
+    fireball_images_up.append(sprite_image)
 
-fireball = Fireball((0, 0), (10, 10), fireball_images)
+for i in range(0, fireball_spritesheet_down.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_down, (0, 0), sprite_rect)
+    fireball_images_down.append(sprite_image)
 
+for i in range(0, fireball_spritesheet_left.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_left, (0, 0), sprite_rect)
+    fireball_images_left.append(sprite_image)
+
+for i in range(0, fireball_spritesheet_right.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_right, (0, 0), sprite_rect)
+    fireball_images_right.append(sprite_image)
+    
+# fireball_up = Fireball((0, 0), (0, 0), fireball_images_up)
+# fireball_down = Fireball((0, 0), (0, 0), fireball_images_down)
+# fireball_left = Fireball((0, 0), (0, 0), fireball_images_left)
+# fireball_right = Fireball((0, 0), (0, 0), fireball_images_right)
 
 # 스프라이트 그룹 생성
 all_sprites = pygame.sprite.Group()
-all_sprites.add(fireball)
+# all_sprites.add(fireball_up)
+# all_sprites.add(fireball_down)
+# all_sprites.add(fireball_left)
+# all_sprites.add(fireball_right)
 
 player_rect = player_img.get_rect()
 
@@ -138,7 +170,7 @@ while True:
             Y = mouse_pos_y(y1)
             if rooms[X][Y].canmove:
                 rooms[X][Y].canmove = False
-                player.x = X
+                player.x = X 
                 player.y = Y
                 rooms[player.x][player.y].view = True
                 # 감지 - breeze, snatch
@@ -151,17 +183,25 @@ while True:
                 x1, y1 = pygame.mouse.get_pos()
                 X = mouse_pos_x(x1)
                 Y = mouse_pos_y(y1)
-                SPEED = 0.05
-                vel = (x1 * SPEED, y1 * SPEED)
-                fireball = Fireball((point(player.x + 0.5, player.y + 0.5)), (X,Y), fireball_images)
-                all_sprites.add(fireball)
+                SPEED = 0.05 
+                vel = (x1 * SPEED, y1 * SPEED) 
+                fireball_up = Fireball(point(player.x+0.5, player.y+0.5), vel, fireball_images_up)
+                fireball_down = Fireball(point(player.x+0.5, player.y+0.5), vel, fireball_images_down)
+                fireball_left = Fireball(point(player.x+0.5, player.y+0.5), vel, fireball_images_left)
+                fireball_right = Fireball(point(player.x+0.5, player.y+0.5), vel, fireball_images_right)
+
+                all_sprites.add(fireball_up)
+                all_sprites.add(fireball_down)
+                all_sprites.add(fireball_left)
+                all_sprites.add(fireball_right)
+
                 if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                     # 애니메이션
                     rooms[X][Y].status = "saferoom"
                     textoutput("움푸스가 뒈졋습니다.")
 
     # 맵 렌더링 background, toach, object(status), view
-    all_sprites.update()
+    all_sprites.update() 
 
     screen.fill(BLACK)
 
@@ -214,6 +254,8 @@ while True:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
-    print()
+    # rec1=Fireball.rect
+    # print(rec1)
+
 
     pygame.display.update()
