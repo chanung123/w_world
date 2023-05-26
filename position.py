@@ -4,35 +4,50 @@ MARGIN = 100
 
 
 # 격자 스케일(이미지 정렬)
-def point_core(pos_x, pos_y, box_scale, scale):
+def point_core(pos_x, pos_y, scale):
     """중심을 기준으로 포지션"""
 
     if (0 <= pos_x <= 3) and (0 <= pos_y <= 3):
-        if box_scale < scale:
+        if BOXSCALE < scale:
             return (
-                (pos_x * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
-                ((pos_y) * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
+                (pos_x * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
+                ((pos_y) * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
             )
-        if box_scale == scale:
+        if BOXSCALE == scale:
             return ((pos_x * BOXSCALE) + MARGIN, ((pos_y) * BOXSCALE) + MARGIN)
-        if box_scale > scale:
+        if BOXSCALE > scale:
             return (
-                (pos_x * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
-                ((pos_y) * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
+                (pos_x * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
+                ((pos_y) * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
             )
     if pos_y > 3 or pos_x > 3 :
-        if box_scale < scale:
+        if BOXSCALE < scale:
             return (
-                (3 * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
-                ((3) * BOXSCALE) + MARGIN - (scale - box_scale) / 2,
+                (4 * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
+                ((4) * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
             )
-        if box_scale == scale:
-            return ((3 * BOXSCALE) + MARGIN, ((3) * BOXSCALE) + MARGIN)
-        if box_scale > scale:
+        if BOXSCALE == scale:
+            return ((4 * BOXSCALE) + MARGIN, ((4) * BOXSCALE) + MARGIN)
+        if BOXSCALE > scale:
+            return (  
+                (4 * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
+                ((4) * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
+            )
+        
+    if pos_y < 0 or pos_x < 0 :
+        if BOXSCALE < scale:
             return (
-                (3 * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
-                ((3) * BOXSCALE) + MARGIN + (box_scale - scale) / 2,
+                (1 * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
+                ((1) * BOXSCALE) + MARGIN - (scale - BOXSCALE) / 2,
             )
+        if BOXSCALE == scale:
+            return ((1 * BOXSCALE) + MARGIN, ((1) * BOXSCALE) + MARGIN)
+        if BOXSCALE > scale:
+            return (  
+                (1 * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
+                ((1) * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
+            )
+        
         
 
 
@@ -78,6 +93,18 @@ def point(pos_x, pos_y):
         return ((4 * BOXSCALE) + MARGIN, ((pos_y) * BOXSCALE) + MARGIN)
     if pos_y > 3 :
         return ((pos_x * BOXSCALE) + MARGIN, (4 * BOXSCALE) + MARGIN)
+    
+    
+def point_fireball(pos_x, pos_y):
+    """파이어볼 포지션 정하기"""
+    if (0 <= pos_x <= 3) and (0 <= pos_y <= 3):
+        return ((pos_x * BOXSCALE) + MARGIN + 66, ((pos_y) * BOXSCALE) + MARGIN + 66)
+    if pos_x > 3 :
+        return ((4 * BOXSCALE) + MARGIN+ 66, ((pos_y) * BOXSCALE) + MARGIN+ 66)
+    if pos_y > 3 :
+        return ((pos_x * BOXSCALE) + MARGIN+ 66, (4 * BOXSCALE) + MARGIN+ 66)
+    
+
 
 
 def RenderMap(
