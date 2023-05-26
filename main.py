@@ -149,7 +149,7 @@ while True:
                 X = mouse_pos_x(x1)
                 Y = mouse_pos_y(y1)
                 SPEED = 0.05
-                vel = (x1 * SPEED, y1 * SPEED)
+                vel = (x1 * SPEED, (y1 - 160) * SPEED)
                 fireball = Fireball(
                     (point(player.x + 0.5, player.y + 0.5)), vel, fireball_images
                 )
