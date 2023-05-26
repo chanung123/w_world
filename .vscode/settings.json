@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "editor.formatOnPaste": true,
     "editor.formatOnType": true,
     "[python]": {
@@ -10,3 +11,12 @@
 ],
     "python.formatting.provider": "none"
 }
+=======
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "none"
+}
+>>>>>>> 147d17ced1c7b25793c2539228097fb4c967e6d3
