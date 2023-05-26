@@ -148,8 +148,8 @@ while True:
                 x1, y1 = pygame.mouse.get_pos()
                 X = mouse_pos_x(x1)
                 Y = mouse_pos_y(y1)
-                vel = (x1 - 320, y1 - 240)
-                fireball = Fireball((x1, y1), (5, 0), fireball_images)
+                vel = (0, 10)
+                fireball = Fireball((player.x, player.y), vel, fireball_images)
                 all_sprites.add(fireball)
                 if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                     # 애니메이션

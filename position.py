@@ -51,10 +51,8 @@ def mouse_pos_y(pos_y):
 
 def point(pos_x, pos_y):
     """플레이어 포지션 정하기"""
-    if pos_x >= 0 and pos_x <= 3:
-        if pos_y >= 0 and pos_y <= 3:
-            return ((pos_x * BOXSCALE) + MARGIN, ((pos_y) * BOXSCALE) + MARGIN)
-
+    if (0 <= pos_x <= 3) and (0 <= pos_y <= 3):
+        return ((pos_x * BOXSCALE) + MARGIN, ((pos_y) * BOXSCALE) + MARGIN)
     if pos_x > 3 or pos_y > 3:
         return (((pos_x) * BOXSCALE) + MARGIN, ((pos_y - 1) * BOXSCALE) + MARGIN)
 
