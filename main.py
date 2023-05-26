@@ -1,8 +1,10 @@
 # pylint: disable=C0114
 import sys
+import os
 import pygame
 from classes.Player import Player
 from classes.Room import Room
+from classes.fireball import Fireball
 from position import BOXSCALE, RenderMap, mouse_pos_x, mouse_pos_y, point, point_core
 
 # Initialize the game engine
@@ -57,7 +59,6 @@ pit_img = renderimg("assets/pitch_rava.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
 
-
 text_color = WHITE  # Black
 font = pygame.font.Font("uhBeePuding.ttf", 28)
 textArr = []
@@ -90,6 +91,34 @@ rooms[2][2].status = "wumpus"
 rooms[2][3].status = "pit"
 rooms[3][3].status = "gold"
 
+# 파이어볼
+
+# Spritesheet 이미지 로드
+fireball_spritesheet = pygame.image.load(
+    os.path.join("assets", "sprites", "FireBall_64x64.png")
+).convert_alpha()
+
+# fireball 추출된 sprite 이미지 담을 리스트
+fireball_images = []
+
+# 추출할 각각의 sprite 이미지 크기
+sprite_width = 64
+sprite_height = 64
+
+for i in range(0, fireball_spritesheet.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size)
+    sprite_image.blit(fireball_spritesheet, (0, 0), sprite_rect)
+    fireball_images.append(sprite_image)
+
+fireball = Fireball((320, 240), (10, 0), fireball_images)
+
+# 스프라이트 그룹 생성
+all_sprites = pygame.sprite.Group()
+all_sprites.add(fireball)
+
+
 # 인게임
 while True:
     Clock.tick(FPS)
@@ -109,9 +138,27 @@ while True:
                 player.x = X
                 player.y = Y
                 rooms[player.x][player.y].view = True
+                # 감지 - breeze, snatch
+                # 사망
+
+        # 히히 화살발사
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.arrows -= 1
+                x1, y1 = pygame.mouse.get_pos()
+                X = mouse_pos_x(x1)
+                Y = mouse_pos_y(y1)
+                vel = (x1 - 320, y1 - 240)
+                fireball = Fireball((x1, y1), (5, 0), fireball_images)
+                all_sprites.add(fireball)
+                if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
+                    # 애니메이션
+                    rooms[X][Y].status = "saferoom"
+                    textoutput("움푸스가 뒈졋습니다.")
 
     # 맵 렌더링 background, toach, object(status), view
     screen.fill(BLACK)
+
     RenderMap(
         screen,
         map_img,
@@ -133,6 +180,9 @@ while True:
             if not rooms[x][y].view:
                 screen.blit(dark_img, (point(x, y)))
 
+    all_sprites.draw(screen)
+    all_sprites.update()
+
     # 이동할 수 있는 곳 밝은 프레임으로 감싸기
     framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
     for pos_box in framePos:
@@ -146,9 +196,15 @@ while True:
 
     # 플레이어 렌더링
     screen.blit(player_img, (point(player.x, player.y)))
+    # 현재위치
     screen.blit(
         font.render(str(player.x) + "," + str(player.y), True, text_color), (800, 100)
     )
+    # 화살수
+    screen.blit(
+        font.render("화살: " + str(player.arrows) + "개", True, text_color), (850, 100)
+    )
+    # fireball
 
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
