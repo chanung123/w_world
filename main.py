@@ -96,7 +96,7 @@ rooms[3][3].status = "gold"
 # Spritesheet 이미지 로드
 fireball_spritesheet = pygame.image.load(
     os.path.join("assets", "sprites", "FireBall_64x64.png")
-).convert_alpha()
+)
 
 # fireball 추출된 sprite 이미지 담을 리스트
 fireball_images = []
@@ -108,11 +108,11 @@ sprite_height = 64
 for i in range(0, fireball_spritesheet.get_width(), sprite_width):
     # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
     sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
-    sprite_image = pygame.Surface(sprite_rect.size)
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
     sprite_image.blit(fireball_spritesheet, (0, 0), sprite_rect)
     fireball_images.append(sprite_image)
 
-fireball = Fireball((320, 240), (10, 0), fireball_images)
+fireball = ""
 
 # 스프라이트 그룹 생성
 all_sprites = pygame.sprite.Group()
@@ -148,8 +148,11 @@ while True:
                 x1, y1 = pygame.mouse.get_pos()
                 X = mouse_pos_x(x1)
                 Y = mouse_pos_y(y1)
-                vel = (x1 - 320, y1 - 240)
-                fireball = Fireball((x1, y1), (5, 0), fireball_images)
+                SPEED = 0.05
+                vel = (x1 * SPEED, (y1 - 160) * SPEED)
+                fireball = Fireball(
+                    (point(player.x + 0.5, player.y + 0.5)), vel, fireball_images
+                )
                 all_sprites.add(fireball)
                 if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                     # 애니메이션
@@ -157,6 +160,8 @@ while True:
                     textoutput("움푸스가 뒈졋습니다.")
 
     # 맵 렌더링 background, toach, object(status), view
+    all_sprites.update()
+
     screen.fill(BLACK)
 
     RenderMap(
@@ -181,7 +186,6 @@ while True:
                 screen.blit(dark_img, (point(x, y)))
 
     all_sprites.draw(screen)
-    all_sprites.update()
 
     # 이동할 수 있는 곳 밝은 프레임으로 감싸기
     framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
@@ -204,7 +208,6 @@ while True:
     screen.blit(
         font.render("화살: " + str(player.arrows) + "개", True, text_color), (850, 100)
     )
-    # fireball
 
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
