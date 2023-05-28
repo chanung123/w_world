@@ -200,12 +200,23 @@ while True:
                 x1, y1 = pygame.mouse.get_pos()
                 X = mouse_pos_x(x1)
                 Y = mouse_pos_y(y1)
-                SPEED = 0.05
-                vel = (x1 * SPEED, y1 * SPEED)
-                fireball = Fireball(
-                    (point(player.x + 0.5, player.y + 0.5)), vel, fireball_images
-                )
-                all_sprites.add(fireball)
+                SPEED = 10  
+                vel = (x1 * SPEED, y1 * SPEED) 
+                if player.y > Y:
+                    fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
+                    all_sprites.add(fireball_up)
+                elif player.y < Y: 
+                    fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
+                    all_sprites.add(fireball_down)
+                elif player.x > X: 
+                    fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
+                    all_sprites.add(fireball_left)
+                elif player.x < X: 
+                    fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
+                    all_sprites.add(fireball_right)
+                
+                
+
                 if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                     # 애니메이션
                     rooms[X][Y].status = "saferoom"
