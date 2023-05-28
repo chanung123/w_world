@@ -1,8 +1,11 @@
 # pylint: disable=C0114
 import sys
+import os
 import pygame
 from classes.Player import Player
 from classes.Room import Room
+from classes.fireball import Fireball
+from position import BOXSCALE, RenderMap, mouse_pos_x, mouse_pos_y, point, point_core, point_fireball
 
 # Initialize the game engine
 # pylint: disable=no-member
@@ -13,31 +16,26 @@ FPS = 60
 Clock = pygame.time.Clock()
 
 ## 컬러 세팅 ##
-BLUE = (0, 0, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # 격자만들기(가로)
 EDGE = 0  # (0,0)
-BOXSCALE = 130
-MARGIN = 100
-FIREPOSITION = 35
 FRAMSCALE = 265
 
-def M_icon(click):
-    if click == 0:
-        # 마우스 커서 기본
-        pygame.mouse.set_cursor(*pygame.cursors.arrow)
-    if click == 1:
-        # x표시
+pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
+# pygame.mouse.set_visible(False)
+
+def cursoricon(cursor):
+    """칸에 커서올라가면 마우스 변경"""
+    if cursor:  # 마우스 커서 on
         pygame.mouse.set_cursor(*pygame.cursors.diamond)
+    else:  # 마우스 커서 off
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
 
 ## 게임 창 설정 ##
 screen = pygame.display.set_mode((1300, 720))
-screen.fill(WHITE)  # 하얀색으로 배경 채우기
 pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
 
@@ -45,7 +43,8 @@ def renderimg(src, rscale=BOXSCALE):
     """에셋 불러오기"""
     return pygame.transform.scale(pygame.image.load(src), (rscale, rscale))
 
-frame_img = renderimg("assets/frame.png",FRAMSCALE)
+
+frame_img = renderimg("assets/frame.png", FRAMSCALE)
 
 map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
@@ -62,71 +61,18 @@ pit_img = renderimg("assets/pitch_rava.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
 
+cursor_img_on = pygame.image.load("assets\curcor_on.png")
+cursor_img_on = pygame.transform.scale(cursor_img_on, (50,50))
+cursor_img_off = pygame.image.load("assets\curcor_off.png")
+cursor_img_off = pygame.transform.scale(cursor_img_off, (50,50))
 
-#격자 스케일(이미지 정렬)
-def point_core(postionx, postiony, box_scale, scale):
-    #중심을 기준으로 포지션
-    if box_scale < scale:
-        if postionx >= 0 and postionx <= 3:
-            if postiony >= 0 and postiony <= 3:
-                return ((postionx * BOXSCALE) + MARGIN - (scale-box_scale)/2, ((postiony) * BOXSCALE) + MARGIN -(scale-box_scale)/2)
-
-        if postionx > 3 or postiony > 3:
-            return ((postionx * BOXSCALE) + MARGIN - (scale-box_scale)/2, ((postiony-1) * BOXSCALE) + MARGIN - (scale-box_scale)/2)
-    if box_scale == scale:
-        if postionx >= 0 and postionx <= 3:
-            if postiony >= 0 and postiony <= 3:
-                return ((postionx * BOXSCALE) + MARGIN, ((postiony) * BOXSCALE) + MARGIN)
-
-        if postionx > 3 or postiony > 3:
-            return (((postionx) * BOXSCALE) + MARGIN, ((postiony - 1) * BOXSCALE) + MARGIN)
-    if box_scale > scale:
-        if postionx >= 0 and postionx <= 3:
-            if postiony >= 0 and postiony <= 3:
-                return ((postionx * BOXSCALE) + MARGIN + (box_scale-scale)/2, ((postiony) * BOXSCALE) + MARGIN + (box_scale-scale)/2)
-
-        if postionx > 3 or postiony > 3:
-            return ((postionx * BOXSCALE) + MARGIN + (box_scale-scale)/2, ((postiony-1) * BOXSCALE) + MARGIN + (box_scale-scale)/2)
-            
-
-#마우스 격자
-def mouse_pos_x(pos_x):
-    if pos_x >= MARGIN and pos_x < MARGIN + BOXSCALE:
-        return 0
-    if pos_x >= MARGIN + BOXSCALE and pos_x < MARGIN + (BOXSCALE*2):
-        return 1
-    if pos_x >= MARGIN + (BOXSCALE*2) and pos_x < MARGIN + (BOXSCALE*3):
-        return 2
-    if pos_x >= MARGIN + (BOXSCALE*3) and pos_x < MARGIN + (BOXSCALE*4):
-        return 3
-    else:
-        return 0
-
-def mouse_pos_y(pos_y):
-    if pos_y >= MARGIN and pos_y < MARGIN + BOXSCALE:
-        return 0
-    if pos_y >= MARGIN + BOXSCALE and pos_y < MARGIN + (BOXSCALE*2):
-        return 1
-    if pos_y >= MARGIN + (BOXSCALE*2) and pos_y < MARGIN + (BOXSCALE*3):
-        return 2
-    if pos_y >= MARGIN + (BOXSCALE*3) and pos_y < MARGIN + (BOXSCALE*4):
-        return 3
-    else:
-        return 0
-
-def point(postionx, postiony):
-    """플레이어 포지션 정하기"""
-    if postionx >= 0 and postionx <= 3:
-        if postiony >= 0 and postiony <= 3:
-            return ((postionx * BOXSCALE) + MARGIN, ((postiony) * BOXSCALE) + MARGIN)
-
-    if postionx > 3 or postiony > 3:
-        return (((postionx) * BOXSCALE) + MARGIN, ((postiony - 1) * BOXSCALE) + MARGIN)
+click = False
 
 
 text_color = WHITE  # Black
 font = pygame.font.Font("uhBeePuding.ttf", 28)
 textArr = []
+
 
 def textoutput(outtext):
     """텍스트 출력해주는 함수"""
@@ -134,6 +80,7 @@ def textoutput(outtext):
     textArr.append(text_surface)
     if len(textArr) > 10:
         del textArr[0]
+
 
 ##초기화
 
@@ -154,56 +101,134 @@ rooms[2][2].status = "wumpus"
 rooms[2][3].status = "pit"
 rooms[3][3].status = "gold"
 
+# 파이어볼
 
-def RenderMap(
-    BOXSCALE,
-    FIREPOSITION,
-    screen,
-    map_img,
-    fire_img,
-    fire_img_down,
-    fire_img_left,
-    fire_img_right,
-):
-    screen.blit(map_img, (24, 10))
-    screen.blit(fire_img, (BOXSCALE + FIREPOSITION, 0))
-    screen.blit(fire_img, ((3 * BOXSCALE) + FIREPOSITION, 0))
-    screen.blit(fire_img_down, (BOXSCALE + FIREPOSITION, BOXSCALE * 4 + FIREPOSITION * 2))
-    screen.blit(fire_img_down, ((3 * BOXSCALE) + 35, BOXSCALE * 4 + FIREPOSITION * 2))
-    screen.blit(fire_img_left, (0, BOXSCALE + FIREPOSITION))
-    screen.blit(fire_img_left, (0, (3 * BOXSCALE) + FIREPOSITION))
-    screen.blit(fire_img_right, ((4 * BOXSCALE) + FIREPOSITION * 2, BOXSCALE + FIREPOSITION))
-    screen.blit(fire_img_right,((4 * BOXSCALE) + FIREPOSITION * 2, (3 * BOXSCALE) + FIREPOSITION),)
+# Spritesheet 이미지 로드
+fireball_spritesheet_down = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_down.png"))
+fireball_spritesheet_up = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_up.png"))
+fireball_spritesheet_left = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_left.png"))
+fireball_spritesheet_right = pygame.image.load(os.path.join("assets", "sprites", "FireBall_64x64_right.png"))
 
 
+# fireball 추출된 sprite 이미지 담을 리스트
+fireball_images_up = []
+fireball_images_down = []
+fireball_images_left = []
+fireball_images_right = []
+
+
+# 추출할 각각의 sprite 이미지 크기 
+sprite_width = 64
+sprite_height = 64
+
+for i in range(0, fireball_spritesheet_up.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_up, (0, 0), sprite_rect)
+    fireball_images_up.append(sprite_image)
+
+for i in range(0, fireball_spritesheet_down.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_down, (0, 0), sprite_rect)
+    fireball_images_down.append(sprite_image)
+
+for i in range(0, fireball_spritesheet_left.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_left, (0, 0), sprite_rect)
+    fireball_images_left.append(sprite_image)
+
+for i in range(0, fireball_spritesheet_right.get_width(), sprite_width):
+    # (i, 0) 위치부터 sprite_width x sprite_height 크기로 이미지 추출
+    sprite_rect = pygame.Rect((i, 0), (sprite_width, sprite_height))
+    sprite_image = pygame.Surface(sprite_rect.size, pygame.SRCALPHA)
+    sprite_image.blit(fireball_spritesheet_right, (0, 0), sprite_rect)
+    fireball_images_right.append(sprite_image)
+    
+# fireball_up = Fireball((0, 0), (0, 0), fireball_images_up)
+# fireball_down = Fireball((0, 0), (0, 0), fireball_images_down)
+# fireball_left = Fireball((0, 0), (0, 0), fireball_images_left)
+# fireball_right = Fireball((0, 0), (0, 0), fireball_images_right)
+
+# 스프라이트 그룹 생성
+all_sprites = pygame.sprite.Group()
+# all_sprites.add(fireball_up)
+# all_sprites.add(fireball_down)
+# all_sprites.add(fireball_left)
+# all_sprites.add(fireball_right)
+
+player_rect = player_img.get_rect()
+
+# 인게임
 while True:
+
     Clock.tick(FPS)
     # 현재위치
     currentRoom = rooms[player.x][player.y]
-
     for event in pygame.event.get():
         # # 게임을 종료시키는 함수
         if event.type == pygame.QUIT:
             sys.exit()
-        #캐릭터 이동
+        # 캐릭터 이동
         if event.type == pygame.MOUSEBUTTONDOWN:
-            x1, y1 = event.pos
-            x = mouse_pos_x(x1)
-            y = mouse_pos_y(y1)
-            if rooms[x][y].canmove:
-                rooms[x][y].canmove = False
-                player.x = x
-                player.y = y
-                textoutput("마우스 이동")
-                rooms[player.x][player.y].view = True
+            click = True
+            x1, y1 = pygame.mouse.get_pos()
+            X = mouse_pos_x(x1)
+            Y = mouse_pos_y(y1)
+            if abs(player.x - X)==1 or abs(player.y-Y)==1:
+                if rooms[X][Y].canmove:
+                    rooms[X][Y].canmove = False
+                    player.x = X 
+                    player.y = Y
+                    rooms[player.x][player.y].view = True
+                    # 감지 - breeze, snatch
+                    # 사망
+        
+        if event.type == pygame.MOUSEBUTTONUP:
+            click = False
 
+        # 히히 화살발사
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                sys.quit()
+            if event.key == pygame.K_SPACE:
+                player.arrows -= 1
+                x1, y1 = pygame.mouse.get_pos()
+                X = mouse_pos_x(x1)
+                Y = mouse_pos_y(y1)
+                SPEED = 10  
+                vel = (x1 * SPEED, y1 * SPEED) 
+                if player.y > Y:
+                    fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
+                    all_sprites.add(fireball_up)
+                elif player.y < Y: 
+                    fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
+                    all_sprites.add(fireball_down)
+                elif player.x > X: 
+                    fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
+                    all_sprites.add(fireball_left)
+                elif player.x < X: 
+                    fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
+                    all_sprites.add(fireball_right)
+                
+                
 
+                if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
+                    # 애니메이션
+                    rooms[X][Y].status = "saferoom"
+                    textoutput("움푸스가 뒈졋습니다.")
+
+    # 맵 렌더링 background, toach, object(status), view
+    all_sprites.update() 
 
     screen.fill(BLACK)
+    
 
     RenderMap(
-        BOXSCALE,
-        FIREPOSITION,
         screen,
         map_img,
         fire_img,
@@ -212,39 +237,63 @@ while True:
         fire_img_right,
     )
 
+    
+
     for x in range(4):
         # 룸의 상태에 따라 오브젝트 생성. 변경은 위에서 하면 된다. 여긴 안건드려도 됨
         for y in range(4):
             if rooms[x][y].status == "wumpus":
                 screen.blit(wumpus_img, (point(x, y)))
             elif rooms[x][y].status == "pit":
-                screen.blit(pit_img, (point(2, 3)))
+                screen.blit(pit_img, (point(x, y)))
             elif rooms[x][y].status == "gold":
-                screen.blit(gold_img, (point(3, 3)))
+                screen.blit(gold_img, (point(x, y)))
             # 지나간곳만 보임 (view가 false일떄)
             if not rooms[x][y].view:
                 screen.blit(dark_img, (point(x, y)))
 
-    #이동할 수 있는 곳 밝은 프레임으로 감싸기
-    framePos = [-1,0],[1,0],[0,-1],[0,1]
+
+    all_sprites.draw(screen)        
+
+    
+
+    # 이동할 수 있는 곳 밝은 프레임으로 감싸기
+    framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
     for pos_box in framePos:
-        x = player.x+pos_box[0]
-        y = player.y+pos_box[1]
+        x = player.x + pos_box[0]
+        y = player.y + pos_box[1]
+        x1, y1 = pygame.mouse.get_pos()
         if (0 <= x <= 3) and (0 <= y <= 3):
-            x1, y1 = pygame.mouse.get_pos()
-            if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
-                rooms[x][y].canmove = True
-                screen.blit(frame_img, (point_core(x, y, BOXSCALE, FRAMSCALE)))
+            if abs(pos_box[0] + pos_box[1]) == 1:
+                if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
+                    rooms[x][y].canmove = True
+                    screen.blit(frame_img, (point_core(x, y, FRAMSCALE)))
 
     # 플레이어 렌더링
     screen.blit(player_img, (point(player.x, player.y)))
-    screen.blit(font.render(str(player.x) + "," + str(player.y), True, text_color),(800, 100))
+    # 현재위치
+    screen.blit(
+        font.render(str(player.x) + "," + str(player.y), True, text_color), (800, 100)
+    )
+    # 화살수
+    screen.blit(
+        font.render("화살: " + str(player.arrows) + "개", True, text_color), (850, 100)
+    )
 
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
+    # rec1=Fireball.rect
+    
 
     
+    if click == True:
+        mx, my = pygame.mouse.get_pos()
+        screen.blit(cursor_img_on, (mx-20, my-20))
+    
+    if click == False:
+        mx, my = pygame.mouse.get_pos()
+        screen.blit(cursor_img_off, (mx-20, my-20))
 
     pygame.display.update()
