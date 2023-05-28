@@ -1,4 +1,17 @@
 {
+<<<<<<< HEAD
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.linting.pylintArgs": [
+    "--init-hook",
+    "import sys; sys.path.append('path to folder your module is in')"
+],
+    "python.formatting.provider": "none"
+}
+=======
   "editor.formatOnPaste": true,
   "editor.formatOnType": true,
   "[python]": {
@@ -6,3 +19,4 @@
   },
   "python.formatting.provider": "none"
 }
+>>>>>>> 147d17ced1c7b25793c2539228097fb4c967e6d3

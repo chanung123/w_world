@@ -21,7 +21,3 @@ class Fireball(pygame.sprite.Sprite):
         self.rect.move_ip(self.vel)
         sprite_index = int(pygame.time.get_ticks() / 100) % len(self.fireball_images)
         self.image = self.fireball_images[sprite_index]
-        # 이미지 회전
-        self.image = pygame.transform.rotate(
-            self.fireball_images[sprite_index], self.rotate
-        )
