@@ -28,6 +28,29 @@ FRAMSCALE = 265
 pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
 # pygame.mouse.set_visible(False)
 
+BGM = pygame.mixer.Sound("assets/music/bgm.mp3")
+BGM.set_volume(0.05)
+
+feet_sound = pygame.mixer.Sound("assets/music/feet.mp3")
+feet_sound.set_volume(0.5)
+
+clear_sound = pygame.mixer.Sound("assets/music/clear.mp3")
+clear_sound.set_volume(0.1)
+
+start_sound = pygame.mixer.Sound("assets/music/start.mp3")
+start_sound.set_volume(0.4)
+
+fireball_sound = pygame.mixer.Sound("assets/music/fire.mp3")
+fireball_sound.set_volume(0.4)
+
+wumpus_sound = pygame.mixer.Sound("assets/music/wumpus.mp3")
+wumpus_sound.set_volume(0.6)
+
+
+
+
+
+
 def cursoricon(cursor):
     """칸에 커서올라가면 마우스 변경"""
     if cursor:  # 마우스 커서 on
@@ -46,30 +69,30 @@ def renderimg(src, rscale=BOXSCALE):
     return pygame.transform.scale(pygame.image.load(src), (rscale, rscale))
 
 
-frame_img = renderimg("assets/frame.png", FRAMSCALE)
+frame_img = renderimg("assets/image/frame.png", FRAMSCALE)
 
-map_img = pygame.image.load("assets/map.png")
+map_img = pygame.image.load("assets/image/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
-clear_img = pygame.image.load("assets/congratulations.png")
+clear_img = pygame.image.load("assets/image/congratulations.png")
 # clear_img =pygame.transform.scale(clear_img, (670, 700))
 
-fire_img = renderimg("assets/fire.png")
+fire_img = renderimg("assets/image/fire.png")
 fire_img_up = pygame.transform.rotate(fire_img, 0)
 fire_img_down = pygame.transform.rotate(fire_img, 180)
 fire_img_left = pygame.transform.rotate(fire_img, 90)
 fire_img_right = pygame.transform.rotate(fire_img, -90)
 
-gold_img = renderimg("assets/gold in box.png")
-wumpus_img = renderimg("assets/wumpus.png")
-pit_img = renderimg("assets/pitch_rava.png")
-player_img = renderimg("assets/player.png")
-dark_img = renderimg("assets/dark.png")
+gold_img = renderimg("assets/image/gold in box.png")
+wumpus_img = renderimg("assets/image/wumpus.png")
+pit_img = renderimg("assets/image/pitch_rava.png")
+player_img = renderimg("assets/image/player.png")
+dark_img = renderimg("assets/image/dark.png")
 
 
-cursor_img_on = pygame.image.load("assets\curcor_on.png")
+cursor_img_on = pygame.image.load("assets/image/curcor_on.png")
 cursor_img_on = pygame.transform.scale(cursor_img_on, (50,50))
-cursor_img_off = pygame.image.load("assets\curcor_off.png")
+cursor_img_off = pygame.image.load("assets/image/curcor_off.png")
 cursor_img_off = pygame.transform.scale(cursor_img_off, (50,50))
 
 click = False
@@ -206,9 +229,17 @@ player_rect = player_img.get_rect()
 
 Gameover_count = 0 
 
+
+#배경음
+BGM.play()
+
+    
+
 # 인게임
 while True:
 
+    
+    
     Clock.tick(FPS)
     # 현재위치
     currentRoom = rooms[player.x][player.y]
@@ -228,6 +259,7 @@ while True:
                     player.x = X 
                     player.y = Y
                     rooms[player.x][player.y].view = True
+                    feet_sound.play()
                     # 감지 - breeze, snatch
                     # 사망
         
@@ -240,6 +272,9 @@ while True:
                 sys.quit()
             if event.key == pygame.K_SPACE:
                 if player.arrows > 0:
+                    fireball_sound.stop
+                    fireball_sound.play()
+                    fireball_sound.fadeout(1000)
                     player.arrows -= 1
                     x1, y1 = pygame.mouse.get_pos()
                     X = mouse_pos_x(x1)
@@ -265,6 +300,7 @@ while True:
                         # 애니메이션
                         rooms[X][Y].status = "saferoom"
                         textoutput("움푸스가 뒈졋습니다.")
+                        wumpus_sound.play()
 
     # 맵 렌더링 background, toach, object(status), view
     all_sprites.update() 
@@ -348,20 +384,30 @@ while True:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
+    
+
     #게임오버 and 클리어
     if not rooms[player.x][player.y].status == "saferoom":
         #클리어
         if rooms[player.x][player.y].status == "gold": 
            screen.blit(clear_img, ((1300-920)/2 ,0))
+           clear_sound.stop
            textoutput_sensor_gold("축하합니다! 성공입니다!")
+           clear_sound.play()
+        #    clear_sound.fadeout(1000)
+           BGM.stop
+
+       
             
         #게임오버
         else :
             player.x = 0
             player.y = 0
+            player.arrows = 2
             Gameover_count += 1
             textoutput("당신은 죽었습니다.")
             textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
+            start_sound.play()
     
 
     
