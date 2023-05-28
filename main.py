@@ -6,6 +6,8 @@ from classes.Player import Player
 from classes.Room import Room
 from classes.fireball import Fireball
 from position import BOXSCALE, RenderMap, mouse_pos_x, mouse_pos_y, point, point_core, point_fireball
+import random
+import time
 
 # Initialize the game engine
 # pylint: disable=no-member
@@ -49,6 +51,9 @@ frame_img = renderimg("assets/frame.png", FRAMSCALE)
 map_img = pygame.image.load("assets/map.png")
 map_img = pygame.transform.scale(map_img, (670, 700))
 
+clear_img = pygame.image.load("assets/congratulations.png")
+# clear_img =pygame.transform.scale(clear_img, (670, 700))
+
 fire_img = renderimg("assets/fire.png")
 fire_img_up = pygame.transform.rotate(fire_img, 0)
 fire_img_down = pygame.transform.rotate(fire_img, 180)
@@ -60,6 +65,7 @@ wumpus_img = renderimg("assets/wumpus.png")
 pit_img = renderimg("assets/pitch_rava.png")
 player_img = renderimg("assets/player.png")
 dark_img = renderimg("assets/dark.png")
+
 
 cursor_img_on = pygame.image.load("assets\curcor_on.png")
 cursor_img_on = pygame.transform.scale(cursor_img_on, (50,50))
@@ -74,12 +80,31 @@ font = pygame.font.Font("uhBeePuding.ttf", 28)
 textArr = []
 
 
+
 def textoutput(outtext):
     """텍스트 출력해주는 함수"""
     text_surface = font.render(outtext, True, text_color)
     textArr.append(text_surface)
     if len(textArr) > 10:
         del textArr[0]
+
+def textoutput_sensor_wumpus(outtext2):
+    """텍스트 출력해주는 함수"""
+    text_surface = font.render(outtext2, True, text_color)
+    screen.blit(text_surface, (800, 600))
+
+def textoutput_sensor_pitch(outtext2):
+    """텍스트 출력해주는 함수"""
+    text_surface = font.render(outtext2, True, text_color)
+    screen.blit(text_surface, (800, 630))
+
+def textoutput_sensor_gold(outtext2):   
+    """텍스트 출력해주는 함수"""
+    text_surface = font.render(outtext2, True, text_color)
+    screen.blit(text_surface, (550, 610))
+    
+
+
 
 
 ##초기화
@@ -97,9 +122,25 @@ rooms[0][0].view = True
 player = Player(0, 0)
 
 # 장애물 설정
-rooms[2][2].status = "wumpus"
-rooms[2][3].status = "pit"
-rooms[3][3].status = "gold"
+for i in range(100):
+    R1 = random.randrange(0,30)
+    R2 = random.randrange(0,30)
+    if R1 <= 3 and R2 <= 3 :
+        if not (R1 + R2) == 0:
+            rooms[R1][R2].status = "wumpus"
+
+for i in range(100):
+    R1 = random.randrange(0,30)
+    R2 = random.randrange(0,30)
+    if R1 <= 3 and R2 <= 3 :
+        if not (R1 + R2) == 0:
+            rooms[R1][R2].status = "pit"
+            
+R1 = random.randint(2,3)
+R2 = random.randint(2,3)
+if not (R1 + R2) == 0:      
+    rooms[R1][R2].status = "gold"
+
 
 # 파이어볼
 
@@ -163,6 +204,8 @@ all_sprites = pygame.sprite.Group()
 
 player_rect = player_img.get_rect()
 
+Gameover_count = 0 
+
 # 인게임
 while True:
 
@@ -196,31 +239,32 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 sys.quit()
             if event.key == pygame.K_SPACE:
-                player.arrows -= 1
-                x1, y1 = pygame.mouse.get_pos()
-                X = mouse_pos_x(x1)
-                Y = mouse_pos_y(y1)
-                SPEED = 10  
-                vel = (x1 * SPEED, y1 * SPEED) 
-                if player.y > Y:
-                    fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
-                    all_sprites.add(fireball_up)
-                elif player.y < Y: 
-                    fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
-                    all_sprites.add(fireball_down)
-                elif player.x > X: 
-                    fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
-                    all_sprites.add(fireball_left)
-                elif player.x < X: 
-                    fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
-                    all_sprites.add(fireball_right)
+                if player.arrows > 0:
+                    player.arrows -= 1
+                    x1, y1 = pygame.mouse.get_pos()
+                    X = mouse_pos_x(x1)
+                    Y = mouse_pos_y(y1)
+                    SPEED = 10  
+                    vel = (x1 * SPEED, y1 * SPEED) 
+                    if player.y > Y:
+                        fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
+                        all_sprites.add(fireball_up)
+                    elif player.y < Y: 
+                        fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
+                        all_sprites.add(fireball_down)
+                    elif player.x > X: 
+                        fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
+                        all_sprites.add(fireball_left)
+                    elif player.x < X: 
+                        fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
+                        all_sprites.add(fireball_right)
                 
                 
 
-                if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
-                    # 애니메이션
-                    rooms[X][Y].status = "saferoom"
-                    textoutput("움푸스가 뒈졋습니다.")
+                    if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
+                        # 애니메이션
+                        rooms[X][Y].status = "saferoom"
+                        textoutput("움푸스가 뒈졋습니다.")
 
     # 맵 렌더링 background, toach, object(status), view
     all_sprites.update() 
@@ -263,11 +307,31 @@ while True:
         x = player.x + pos_box[0]
         y = player.y + pos_box[1]
         x1, y1 = pygame.mouse.get_pos()
-        if (0 <= x <= 3) and (0 <= y <= 3):
-            if abs(pos_box[0] + pos_box[1]) == 1:
+        if abs(pos_box[0] + pos_box[1]) == 1:
+            if (0 <= x <= 3) and (0 <= y <= 3):
                 if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
                     rooms[x][y].canmove = True
-                    screen.blit(frame_img, (point_core(x, y, FRAMSCALE)))
+                    screen.blit(frame_img, (point_core(x, y, FRAMSCALE)))                                               
+    # 감지
+    textout = True               
+    framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
+    for pos_box in framePos:
+        x = player.x + pos_box[0]
+        y = player.y + pos_box[1]
+        
+        if abs(pos_box[0] + pos_box[1]) == 1:
+            if (0 <= x <= 3) and (0 <= y <= 3):
+                if rooms[x][y].status == "wumpus":
+                    textoutput_sensor_wumpus("웜프스의 냄새가 납니다!")
+                if rooms[x][y].status == "pit" :
+                    textoutput_sensor_pitch("주위가 뜨겁습니다!") 
+
+
+                
+    
+
+    
+                    
 
     # 플레이어 렌더링
     screen.blit(player_img, (point(player.x, player.y)))
@@ -284,7 +348,20 @@ while True:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
 
-    # rec1=Fireball.rect
+    #게임오버 and 클리어
+    if not rooms[player.x][player.y].status == "saferoom":
+        #클리어
+        if rooms[player.x][player.y].status == "gold": 
+           screen.blit(clear_img, ((1300-920)/2 ,0))
+           textoutput_sensor_gold("축하합니다! 성공입니다!")
+            
+        #게임오버
+        else :
+            player.x = 0
+            player.y = 0
+            Gameover_count += 1
+            textoutput("당신은 죽었습니다.")
+            textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
     
 
     
