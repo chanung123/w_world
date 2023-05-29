@@ -157,20 +157,17 @@ if not (R1 + R2) == 0:
     rooms[R1][R2].status = "gold"
 
 
+# 파이어볼
+
 # fireball 추출된 sprite 이미지 담을 리스트
 fireball_images = [[], [], [], []]
-fireball_eachway_image = [
-    "FireBall_64x64_up.png",
-    "FireBall_64x64_down.png",
-    "FireBall_64x64_left.png",
-    "FireBall_64x64_right.png",
-]
+fireball_eachway_image = ["up", "down", "left", "right"]
 # 추출할 각각의 sprite 이미지 크기
 sprite_width = 64
 sprite_height = 64
 
 
-# 파이어볼
+# 파이어볼 로드(이미지 불러오기)
 def fireball_load(idx, image):
     # Spritesheet 이미지 로드
     fireball_spritesheet = pygame.image.load(os.path.join("assets", "sprites", image))
@@ -182,8 +179,26 @@ def fireball_load(idx, image):
         fireball_images[idx].append(sprite_image)
 
 
+# 상하좌우로딩
 for idx, val in enumerate(fireball_eachway_image):
+    val = f"FireBall_64x64_{val}.png"
     fireball_load(idx, val)
+
+
+def fireball_render(
+    x,
+    y,
+    direction,
+):
+    """파이어볼 렌더링"""
+    speed = 10
+    vel = (x * speed, y * speed)
+    fireball = Fireball(
+        point_fireball(player.x, player.y),
+        vel,
+        fireball_images[direction],
+    )
+    all_sprites.add(fireball)
 
 
 # 스프라이트 그룹 생성
@@ -218,6 +233,23 @@ while True:
                     feet_sound.play()
                     # 감지 - breeze, snatch
                     # 사망
+                    # 게임오버 and 클리어
+            if not rooms[player.x][player.y].status == "saferoom":
+                # 클리어
+                if rooms[player.x][player.y].status == "gold":
+                    screen.blit(clear_img, ((1300 - 920) / 2, 0))
+                    textoutput_sensor("축하합니다! 성공입니다!", 500, 610)
+                    clear_sound.stop()
+                    clear_sound.play()
+                # 게임오버
+                else:
+                    player.x = 0
+                    player.y = 0
+                    player.arrows = 2
+                    Gameover_count += 1
+                    textoutput("당신은 죽었습니다.")
+                    textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
+                    start_sound.play()
 
         if event.type == pygame.MOUSEBUTTONUP:
             click = False
@@ -234,41 +266,24 @@ while True:
                     x1, y1 = pygame.mouse.get_pos()
                     X = mouse_pos_x(x1)
                     Y = mouse_pos_y(y1)
-                    SPEED = 10
-                    vel = (x1 * SPEED, y1 * SPEED)
+
                     if player.y > Y:
-                        fireball_up = Fireball(
-                            point_fireball(player.x, player.y),
-                            (0 * SPEED, -1 * SPEED),
-                            fireball_images[0],
-                        )
-                        all_sprites.add(fireball_up)
+                        # up
+                        fireball_render(0, -1, 0)
                     elif player.y < Y:
-                        fireball_down = Fireball(
-                            point_fireball(player.x, player.y),
-                            (0 * SPEED, 1 * SPEED),
-                            fireball_images[1],
-                        )
-                        all_sprites.add(fireball_down)
+                        # down
+                        fireball_render(0, 1, 1)
                     elif player.x > X:
-                        fireball_left = Fireball(
-                            point_fireball(player.x, player.y),
-                            (-1 * SPEED, 0 * SPEED),
-                            fireball_images[2],
-                        )
-                        all_sprites.add(fireball_left)
+                        # left
+                        fireball_render(-1, 0, 2)
                     elif player.x < X:
-                        fireball_right = Fireball(
-                            point_fireball(player.x, player.y),
-                            (1 * SPEED, 0 * SPEED),
-                            fireball_images[3],
-                        )
-                        all_sprites.add(fireball_right)
+                        # right
+                        fireball_render(1, 0, 3)
 
                     if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
                         # 애니메이션
                         rooms[X][Y].status = "saferoom"
-                        textoutput("움푸스가 뒈졋습니다.")
+                        textoutput(' "끼엑!!" 움푸스가 뒈졋습니다.')
                         wumpus_sound.play()
 
     # 맵 렌더링 background, toach, object(status), view
@@ -312,7 +327,6 @@ while True:
                     rooms[x][y].canmove = True
                     screen.blit(frame_img, (point_core(x, y, FRAMSCALE)))
     # 감지
-    framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
     for pos_box in framePos:
         x = player.x + pos_box[0]
         y = player.y + pos_box[1]
@@ -338,27 +352,6 @@ while True:
     for text in textArr:
         x = 30 * (textArr.index(text) + 1)
         screen.blit(text, (800, x + 100))
-
-    # 게임오버 and 클리어
-    if not rooms[player.x][player.y].status == "saferoom":
-        # 클리어
-        if rooms[player.x][player.y].status == "gold":
-            screen.blit(clear_img, ((1300 - 920) / 2, 0))
-            clear_sound.stop
-            textoutput_sensor("축하합니다! 성공입니다!", 500, 610)
-            clear_sound.play()
-            #    clear_sound.fadeout(1000)
-            BGM.stop
-
-        # 게임오버
-        else:
-            player.x = 0
-            player.y = 0
-            player.arrows = 2
-            Gameover_count += 1
-            textoutput("당신은 죽었습니다.")
-            textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
-            start_sound.play()
 
     if click == True:
         mx, my = pygame.mouse.get_pos()
