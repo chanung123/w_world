@@ -47,9 +47,6 @@ def point_core(pos_x, pos_y, scale):
                 (1 * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
                 ((1) * BOXSCALE) + MARGIN + (BOXSCALE - scale) / 2,
             )
-        
-        
-
 
 
 # 마우스 격자

@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "esbenp.prettier-vscode",
-        "naumovs.color-highlight"
+        "naumovs.color-highlight",
+        "ms-ceintl.vscode-language-pack-ko"
     ]
 }

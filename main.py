@@ -8,12 +8,21 @@ from classes.fireball import Fireball
 from position import BOXSCALE, RenderMap, mouse_pos_x, mouse_pos_y, point, point_core, point_fireball
 import random
 import time
+import Mixer
+import spritesheet
+import threading
+
+
 
 # Initialize the game engine
 # pylint: disable=no-member
 pygame.init()
 
-## 초당 프레임 단위 설정 ##
+## 게임 창 설정 ##
+screen = pygame.display.set_mode((1300, 720))
+pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
+
+## 초당 프레임 단위 설정 ## 
 FPS = 60
 Clock = pygame.time.Clock()
 
@@ -25,29 +34,31 @@ WHITE = (255, 255, 255)
 EDGE = 0  # (0,0)
 FRAMSCALE = 265
 
+sprite_sheet_image = pygame.image.load("assets\sprites\wizard.png").convert_alpha()
+sprite_sheet = spritesheet.SpriteSheet(sprite_sheet_image)
+
+
+#create animation list
+animation_list = []
+animation_steps = [8,7, 6, 8, 8, 6, 3, 7]
+action = 1
+last_update = pygame.time.get_ticks()
+animation_cooldown = 120
+frame = 0
+step_counter = 0
+
+WIDTH=128
+HEIGHT=128
+
+for animation in animation_steps:
+    temp_img_list = []
+    for _ in range(animation):
+        temp_img_list.append(sprite_sheet.get_image(step_counter, WIDTH, HEIGHT, 1.3 ,BLACK))
+        step_counter += 1
+    animation_list.append(temp_img_list)
+
+
 pygame.mouse.set_cursor((8,8),(0,0),(0,0,0,0,0,0,0,0),(0,0,0,0,0,0,0,0))
-# pygame.mouse.set_visible(False)
-
-BGM = pygame.mixer.Sound("assets/music/bgm.mp3")
-BGM.set_volume(0.05)
-
-feet_sound = pygame.mixer.Sound("assets/music/feet.mp3")
-feet_sound.set_volume(0.5)
-
-clear_sound = pygame.mixer.Sound("assets/music/clear.mp3")
-clear_sound.set_volume(0.1)
-
-start_sound = pygame.mixer.Sound("assets/music/start.mp3")
-start_sound.set_volume(0.4)
-
-fireball_sound = pygame.mixer.Sound("assets/music/fire.mp3")
-fireball_sound.set_volume(0.4)
-
-wumpus_sound = pygame.mixer.Sound("assets/music/wumpus.mp3")
-wumpus_sound.set_volume(0.6)
-
-
-
 
 
 
@@ -58,10 +69,6 @@ def cursoricon(cursor):
     else:  # 마우스 커서 off
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
-
-## 게임 창 설정 ##
-screen = pygame.display.set_mode((1300, 720))
-pygame.display.set_caption("움푸스 월드")  # 창 이름 설정
 
 
 def renderimg(src, rscale=BOXSCALE):
@@ -83,11 +90,12 @@ fire_img_down = pygame.transform.rotate(fire_img, 180)
 fire_img_left = pygame.transform.rotate(fire_img, 90)
 fire_img_right = pygame.transform.rotate(fire_img, -90)
 
-gold_img = renderimg("assets/image/gold in box.png")
-wumpus_img = renderimg("assets/image/wumpus.png")
-pit_img = renderimg("assets/image/pitch_rava.png")
+gold_img = renderimg("assets\image\GEM.png")
+wumpus_img = renderimg("assets\image\ork.png")
+pit_img = renderimg("assets\image\lava_pit.png")
 player_img = renderimg("assets/image/player.png")
 dark_img = renderimg("assets/image/dark.png")
+magic_circle_img = renderimg("assets\image\magic_circle.png")
 
 
 cursor_img_on = pygame.image.load("assets/image/curcor_on.png")
@@ -231,76 +239,198 @@ Gameover_count = 0
 
 
 #배경음
-BGM.play()
-
+# BGM.play()
+Mixer.playmusic("assets/music/bgm.mp3", 0.1)    
     
+MOVE_right = False
+MOVE_left = False
+MOVE_up = False
+MOVE_down = False
+
+fireball = False
+
+pos_X = (player.x)*130+100
+pos_Y = (player.y)*130+40
+
+MOVE = False
+GAMEOVER = False
+
+cnt = 0
+
 
 # 인게임
 while True:
 
+    # GAMEOVER = False
+    # print(action, fireball)
+    # print(pos_X, pos_Y)
+    # print(GAMEOVER)
+
+    # action = 1
     
+    if fireball:
+            action = 3
+            cnt += 1
+            if cnt == 48:
+                fireball = False 
+                cnt = 0
+                frame = 0
+                action = 1 
+                MOVE = False
+            elif cnt > 48:
+                cnt = 0
+            
+     
+
+    elif MOVE_right:
+        MOVE = True
+        action = 4
+        pos_X += 1
+        if (pos_X-100)/130 == player.x:
+            MOVE_right = False
+            pos_X = 0
+            pos_y = 0
+            pos_X = (player.x)*130+100
+            pos_Y = (player.y)*130+40   
+            frame = 0
+            action = 1 
+            MOVE = False
+
+    elif MOVE_left:
+        MOVE = True
+        action = 0
+        pos_X -= 1
+        if (pos_X-100)/130 == player.x:
+            MOVE_left = False
+            pos_X = 0
+            pos_Y = 0
+            pos_X = (player.x)*130+100
+            pos_Y = (player.y)*130+40 
+            frame = 0
+            action = 1 
+            MOVE = False
+
+    elif MOVE_up:
+        MOVE = True
+        action = 5
+        pos_Y += 1
+        if (pos_Y-40)/130 == player.y:
+            MOVE_up = False
+            pos_X = 0
+            pos_y = 0
+            pos_X = (player.x)*130+100
+            pos_Y = (player.y)*130+40
+            frame = 0 
+            action = 1 
+            MOVE = False
+
+    elif MOVE_down:
+        MOVE = True
+        action = 5
+        pos_Y -= 1
+        if (pos_Y-40)/130 == player.y:
+            MOVE_down = False
+            pos_X = 0
+            pos_y = 0
+            pos_X = (player.x)*130+100
+            pos_Y = (player.y)*130+40 
+            frame = 0
+            action = 1
+            MOVE = False
+
     
+
     Clock.tick(FPS)
+    
     # 현재위치
     currentRoom = rooms[player.x][player.y]
-    for event in pygame.event.get():
-        # # 게임을 종료시키는 함수
-        if event.type == pygame.QUIT:
-            sys.exit()
-        # 캐릭터 이동
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            click = True
-            x1, y1 = pygame.mouse.get_pos()
-            X = mouse_pos_x(x1)
-            Y = mouse_pos_y(y1)
-            if abs(player.x - X)==1 or abs(player.y-Y)==1:
-                if rooms[X][Y].canmove:
-                    rooms[X][Y].canmove = False
-                    player.x = X 
-                    player.y = Y
-                    rooms[player.x][player.y].view = True
-                    feet_sound.play()
-                    # 감지 - breeze, snatch
-                    # 사망
-        
-        if event.type == pygame.MOUSEBUTTONUP:
-            click = False
+    if not MOVE:
+        for event in pygame.event.get():
+            # # 게임을 종료시키는 함수
+            if event.type == pygame.QUIT:
+                sys.exit()
+            # 캐릭터 이동
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                click = True
+                start_pos_X = 0
+                start_pos_Y = 0  
+                start_pos_X = player.x
+                start_pos_Y = player.y
 
-        # 히히 화살발사
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                sys.quit()
-            if event.key == pygame.K_SPACE:
-                if player.arrows > 0:
-                    fireball_sound.stop
-                    fireball_sound.play()
-                    fireball_sound.fadeout(1000)
-                    player.arrows -= 1
-                    x1, y1 = pygame.mouse.get_pos()
-                    X = mouse_pos_x(x1)
-                    Y = mouse_pos_y(y1)
-                    SPEED = 10  
-                    vel = (x1 * SPEED, y1 * SPEED) 
-                    if player.y > Y:
-                        fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
-                        all_sprites.add(fireball_up)
-                    elif player.y < Y: 
-                        fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
-                        all_sprites.add(fireball_down)
-                    elif player.x > X: 
-                        fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
-                        all_sprites.add(fireball_left)
-                    elif player.x < X: 
-                        fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
-                        all_sprites.add(fireball_right)
-                
-                
+                x1, y1 = pygame.mouse.get_pos()
+                X = mouse_pos_x(x1)
+                Y = mouse_pos_y(y1)
+                if rooms[X][Y].canmove == True:
+                    if start_pos_X < X:
+                        MOVE_right = True
+                    elif start_pos_X > X:
+                        MOVE_left = True
+                    elif start_pos_Y < Y:
+                        MOVE_up = True
+                    elif start_pos_Y > Y:
+                        MOVE_down = True         
+               
+                    if abs(player.x - X)==1 or abs(player.y-Y)==1:
+                        if rooms[X][Y].canmove:
+                            rooms[X][Y].canmove = False
+                            player.x = X 
+                            player.y = Y
+                            rooms[player.x][player.y].view = True
+                            Mixer.playsound("assets/music/feet.mp3", 0.5)
+                      
+                            
+                        
+            if event.type == pygame.MOUSEBUTTONUP:
+                click = False
+            
+            
 
-                    if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
-                        # 애니메이션
-                        rooms[X][Y].status = "saferoom"
-                        textoutput("움푸스가 뒈졋습니다.")
-                        wumpus_sound.play()
+
+            # 히히 화살발사
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    sys.quit()
+                if event.key == pygame.K_SPACE:
+                    if player.arrows > 0:
+                        Mixer.playsound("assets/music/fire.mp3", 0.5)
+                        fireball = True
+
+                        player.arrows -= 1
+                        x1, y1 = pygame.mouse.get_pos()
+                        X = mouse_pos_x(x1)
+                        Y = mouse_pos_y(y1)
+                        SPEED = 10  
+                        vel = (x1 * SPEED, y1 * SPEED) 
+                        if player.y > Y:
+                            fireball_up = Fireball(point_fireball(player.x, player.y), (0*SPEED,-1*SPEED), fireball_images_up)
+                            all_sprites.add(fireball_up)
+                        elif player.y < Y: 
+                            fireball_down = Fireball(point_fireball(player.x, player.y), (0*SPEED,1*SPEED), fireball_images_down)
+                            all_sprites.add(fireball_down)
+                        elif player.x > X: 
+                            fireball_left = Fireball(point_fireball(player.x, player.y), (-1*SPEED,0*SPEED), fireball_images_left)
+                            all_sprites.add(fireball_left)
+                        elif player.x < X: 
+                            fireball_right = Fireball(point_fireball(player.x, player.y), (1*SPEED,0*SPEED), fireball_images_right)
+                            all_sprites.add(fireball_right)
+                    
+                        if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
+                            # 애니메이션
+                            rooms[X][Y].status = "saferoom"
+                            textoutput("움푸스가 뒈졋습니다.")
+                            Mixer.playsound("assets\music\wumpus.mp3", 0.5)
+                            fireball = False
+                        
+        # if event.type == pygame.KEYUP: 
+        #     if event.type == pygame.K_SPACE:
+        #         fireball == False
+        #         action = 0  
+                
+             
+            # if event.key == pygame.K_DOWN:
+            # if event.key == pygame.K_LEFT:
+            # if event.key == pygame.K_UP:
+                 
 
     # 맵 렌더링 background, toach, object(status), view
     all_sprites.update() 
@@ -348,8 +478,7 @@ while True:
                 if mouse_pos_x(x1) == x and mouse_pos_y(y1) == y:
                     rooms[x][y].canmove = True
                     screen.blit(frame_img, (point_core(x, y, FRAMSCALE)))                                               
-    # 감지
-    textout = True               
+    # 감지             
     framePos = [-1, 0], [1, 0], [0, -1], [0, 1]
     for pos_box in framePos:
         x = player.x + pos_box[0]
@@ -363,14 +492,10 @@ while True:
                     textoutput_sensor_pitch("주위가 뜨겁습니다!") 
 
 
-                
-    
-
-    
-                    
 
     # 플레이어 렌더링
-    screen.blit(player_img, (point(player.x, player.y)))
+    # screen.blit(player_img, (point(player.x, player.y)))
+    screen.blit(magic_circle_img, (point(0, 0)))
     # 현재위치
     screen.blit(
         font.render(str(player.x) + "," + str(player.y), True, text_color), (800, 100)
@@ -389,16 +514,14 @@ while True:
     #게임오버 and 클리어
     if not rooms[player.x][player.y].status == "saferoom":
         #클리어
-        if rooms[player.x][player.y].status == "gold": 
-           screen.blit(clear_img, ((1300-920)/2 ,0))
-           clear_sound.stop
-           textoutput_sensor_gold("축하합니다! 성공입니다!")
-           clear_sound.play()
-        #    clear_sound.fadeout(1000)
-           BGM.stop
-
-       
+        if rooms[player.x][player.y].status == "gold":
+            Mixer.playsound("assets\music\clear.mp3",0.1)
+            screen.blit(clear_img, ((1300-920)/2 ,0))
+            textoutput_sensor_gold("축하합니다! 성공입니다!")
             
+            rooms[player.x][player.y].status == "saferoom"
+            
+
         #게임오버
         else :
             player.x = 0
@@ -407,9 +530,26 @@ while True:
             Gameover_count += 1
             textoutput("당신은 죽었습니다.")
             textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
-            start_sound.play()
+            Mixer.playsound("assets\music\start.mp3",0.5)
+            pos_X = 100
+            pos_Y = 40
+            frame = 0
+            action = 7  
+            MOVE_right = False
+            MOVE_left = False
+            MOVE_up = False
+            MOVE_down = False
+            MOVE = False
     
+    #update animation
+    current_time = pygame.time.get_ticks()
+    if current_time - last_update >= animation_cooldown:
+        frame += 1
+        last_update = current_time
+        if frame >= len(animation_list[action]):
+            frame = 0
 
+    screen.blit(animation_list[action][frame], (pos_X, pos_Y))
     
     if click == True:
         mx, my = pygame.mouse.get_pos()
@@ -420,3 +560,4 @@ while True:
         screen.blit(cursor_img_off, (mx-20, my-20))
 
     pygame.display.update()
+   
