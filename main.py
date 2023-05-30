@@ -79,7 +79,11 @@ def renderimg(src, rscale=BOXSCALE):
 frame_img = renderimg("assets/image/frame.png", FRAMSCALE)
 
 map_img = pygame.image.load("assets/image/map.png")
-map_img = pygame.transform.scale(map_img, (670, 700))
+map_img = pygame.transform.scale(map_img, (668, 700))
+
+
+BG_img = pygame.image.load("assets\image\BG.jpg")
+BG_img = pygame.transform.scale(BG_img, (2807, 720))
 
 clear_img = pygame.image.load("assets/image/congratulations.png")
 # clear_img =pygame.transform.scale(clear_img, (670, 700))
@@ -92,9 +96,10 @@ fire_img_right = pygame.transform.rotate(fire_img, -90)
 
 gold_img = renderimg("assets\image\GEM.png")
 wumpus_img = renderimg("assets\image\ork.png")
-pit_img = renderimg("assets\image\lava_pit.png")
+pit_img = renderimg("assets\image\pitch_rava_.png")
 player_img = renderimg("assets/image/player.png")
 dark_img = renderimg("assets/image/dark.png")
+fog_img = renderimg("assets/image/fog.png")
 magic_circle_img = renderimg("assets\image\magic_circle.png")
 
 
@@ -261,12 +266,7 @@ cnt = 0
 # 인게임
 while True:
 
-    # GAMEOVER = False
-    # print(action, fireball)
-    # print(pos_X, pos_Y)
-    # print(GAMEOVER)
-
-    # action = 1
+    
     
     if fireball:
             action = 3
@@ -420,22 +420,14 @@ while True:
                             textoutput("움푸스가 뒈졋습니다.")
                             Mixer.playsound("assets\music\wumpus.mp3", 0.5)
                             fireball = False
-                        
-        # if event.type == pygame.KEYUP: 
-        #     if event.type == pygame.K_SPACE:
-        #         fireball == False
-        #         action = 0  
                 
-             
-            # if event.key == pygame.K_DOWN:
-            # if event.key == pygame.K_LEFT:
-            # if event.key == pygame.K_UP:
                  
 
     # 맵 렌더링 background, toach, object(status), view
     all_sprites.update() 
 
     screen.fill(BLACK)
+    screen.blit(BG_img,(0,0))
     
 
     RenderMap(
@@ -461,6 +453,7 @@ while True:
             # 지나간곳만 보임 (view가 false일떄)
             if not rooms[x][y].view:
                 screen.blit(dark_img, (point(x, y)))
+                # screen.blit(fog_img, (point(x, y)))
 
 
     all_sprites.draw(screen)        
