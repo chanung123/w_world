@@ -94,7 +94,6 @@ pit_img = renderimg("assets/image/pitch_rava.png")
 player_img = renderimg("assets/image/player.png")
 dark_img = renderimg("assets/image/dark.png")
 
-
 cursor_img_on = pygame.image.load("assets/image/curcor_on.png")
 cursor_img_on = pygame.transform.scale(cursor_img_on, (50, 50))
 cursor_img_off = pygame.image.load("assets/image/curcor_off.png")
