@@ -27,18 +27,65 @@ class Action:
 
 
 # 1. 인풋 받기 - 초기화, 현재위치, 화살개수
-def current_status(playerPos, rooms, arrow):
+def current_status(player, rooms, arrow):
     # rooms에서 view가 true인것만 볼수있다. room에서 받아올값. status, sensor
-    # 확률연산
+
     # 필요없는 액션 제거 - 벽, 화살없음.
-    print("onoe")
+    actionlist = [
+        ["moveup", 0],
+        ["movedown", 0],
+        ["moveleft", 0],
+        ["moveright", 0],
+        ["shootup", 0],
+        ["shootdown", 0],
+        ["shootleft", 0],
+        ["shootright", 0],
+    ]
+    canmoveRooms = [
+        rooms[player.x][player.y - 1],
+        rooms[player.x][player.y + 1],
+        rooms[player.x + 1][player.y],
+        rooms[player.x - 1][player.y],
+    ]
+    for action in actionlist:
+        if player.y == 0 and (action[0] == "moveup" or action[0] == "shootup"):
+            actionlist.remove(action)
+            canmoveRooms.remove(canmoveRooms[0])
+        if player.y == 3 and (action[0] == "movedown" or action[0] == "shootdown"):
+            actionlist.remove(action)
+            canmoveRooms.remove(canmoveRooms[1])
+        if player.x == 0 and (action[0] == "moveleft" or action[0] == "shootleft"):
+            actionlist.remove(action)
+            canmoveRooms.remove(canmoveRooms[2])
+        if player.x == 3 and (action[0] == "moveright" or action[0] == "shootright"):
+            actionlist.remove(action)
+            canmoveRooms.remove(canmoveRooms[3])
+
+    # 암것도 없을경우
+    sensorValues = []
+    for room in canmoveRooms:
+        if room.status == "wumpus":
+            sensorValues.append("stench")
+        if room.status == "pit":
+            sensorValues.append("breeze")
+
+    # 확률연산
+    for action in actionlist:
+        # stench일 경우
+        if "stench" in sensorValues:
+            # TODO:액션에 확률추가
+            print("액션에 확률추가")
+        # breeze일 경우
+        if "breeze" in sensorValues:
+            # TODO:액션에 확률추가
+            print("액션에 확률추가")
 
 
 # 3. 행동판단
 # 4. 리턴값 도출
 
 
-def choose_action(actions, probabilities=None):
+def choose_action(actions):
     """
     주어진 actions와 확률에 따라 액션을 선택하는 함수입니다.
 
