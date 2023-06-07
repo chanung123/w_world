@@ -16,6 +16,8 @@ from position import (
 )
 import random
 
+from wumpus_ai import Action
+
 # Initialize the game engine
 # pylint: disable=no-member
 pygame.init()
@@ -203,12 +205,72 @@ def fireball_render(
 # 스프라이트 그룹 생성
 all_sprites = pygame.sprite.Group()
 player_rect = player_img.get_rect()
-Gameover_count = 0
+
 
 # 배경음
 BGM.play()
 
+
 # 인게임
+def shoot_arrow(target):
+    if player.arrows > 0:
+        fireball_sound.play()
+        fireball_sound.fadeout(500)
+        player.arrows -= 1
+        X, Y = target
+
+        if player.y > Y:
+            # up
+            fireball_render(0, -1, 0)
+        elif player.y < Y:
+            # down
+            fireball_render(0, 1, 1)
+        elif player.x > X:
+            # left
+            fireball_render(-1, 0, 2)
+        elif player.x < X:
+            # right
+            fireball_render(1, 0, 3)
+
+        if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
+            # 애니메이션
+            rooms[X][Y].status = "saferoom"
+            textoutput(' "끼엑!!" 움푸스가 뒈졋습니다.')
+            wumpus_sound.play()
+
+
+action = Action()
+
+gameover_count = 0
+
+
+def move(target):
+    global gameover_count
+    X, Y = target
+    if abs(player.x - X) == 1 or abs(player.y - Y) == 1:
+        # if rooms[X][Y].canmove:
+        #     rooms[X][Y].canmove = False
+        player.x = X
+        player.y = Y
+        rooms[player.x][player.y].view = True
+        # 게임오버 and 클리어
+    if not rooms[player.x][player.y].status == "saferoom":
+        # 클리어
+        if rooms[player.x][player.y].status == "gold":
+            screen.blit(clear_img, ((1300 - 920) / 2, 0))
+            textoutput_sensor("축하합니다! 성공입니다!", 500, 610)
+            clear_sound.play()
+            # 게임오버
+        else:
+            player.x = 0
+            player.y = 0
+            player.arrows = 2
+            gameover_count += 1
+            textoutput("당신은 죽었습니다.")
+            textoutput(f"지금까지 죽은 횟수: {gameover_count}")
+            start_sound.play()
+
+
 while True:
     Clock.tick(FPS)
     # 현재위치
@@ -219,71 +281,18 @@ while True:
             sys.exit()
         # 캐릭터 이동
         if event.type == pygame.MOUSEBUTTONDOWN:
-            click = True
-            x1, y1 = pygame.mouse.get_pos()
-            X = mouse_pos_x(x1)
-            Y = mouse_pos_y(y1)
-            if abs(player.x - X) == 1 or abs(player.y - Y) == 1:
-                if rooms[X][Y].canmove:
-                    rooms[X][Y].canmove = False
-                    player.x = X
-                    player.y = Y
-                    rooms[player.x][player.y].view = True
-                    feet_sound.play()
-                    # 감지 - breeze, snatch
-                    # 사망
-                    # 게임오버 and 클리어
-            if not rooms[player.x][player.y].status == "saferoom":
-                # 클리어
-                if rooms[player.x][player.y].status == "gold":
-                    screen.blit(clear_img, ((1300 - 920) / 2, 0))
-                    textoutput_sensor("축하합니다! 성공입니다!", 500, 610)
-                    clear_sound.stop()
-                    clear_sound.play()
-                # 게임오버
-                else:
-                    player.x = 0
-                    player.y = 0
-                    player.arrows = 2
-                    Gameover_count += 1
-                    textoutput("당신은 죽었습니다.")
-                    textoutput(f"지금까지 죽은 횟수: {Gameover_count}")
-                    start_sound.play()
-
-        if event.type == pygame.MOUSEBUTTONUP:
-            click = False
+            # x1, y1 = pygame.mouse.get_pos()
+            # shoot_arrow((mouse_pos_x(x1), mouse_pos_y(y1)))
+            move((1, 0))
 
         # 히히 화살발사
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 sys.quit()
             if event.key == pygame.K_SPACE:
-                if player.arrows > 0:
-                    fireball_sound.play()
-                    fireball_sound.fadeout(1000)
-                    player.arrows -= 1
-                    x1, y1 = pygame.mouse.get_pos()
-                    X = mouse_pos_x(x1)
-                    Y = mouse_pos_y(y1)
-
-                    if player.y > Y:
-                        # up
-                        fireball_render(0, -1, 0)
-                    elif player.y < Y:
-                        # down
-                        fireball_render(0, 1, 1)
-                    elif player.x > X:
-                        # left
-                        fireball_render(-1, 0, 2)
-                    elif player.x < X:
-                        # right
-                        fireball_render(1, 0, 3)
-
-                    if rooms[X][Y].canmove and rooms[X][Y].status == "wumpus":
-                        # 애니메이션
-                        rooms[X][Y].status = "saferoom"
-                        textoutput(' "끼엑!!" 움푸스가 뒈졋습니다.')
-                        wumpus_sound.play()
+                action.move(player, "down")
+                # x1, y1 = pygame.mouse.get_pos()
+                # shoot_arrow((mouse_pos_x(x1), mouse_pos_y(y1)))
 
     # 맵 렌더링 background, toach, object(status), view
     all_sprites.update()
@@ -333,8 +342,12 @@ while True:
         if abs(pos_box[0] + pos_box[1]) == 1:
             if (0 <= x <= 3) and (0 <= y <= 3):
                 if rooms[x][y].status == "wumpus":
+                    if not "w" in rooms[x][y].sensor:
+                        rooms[x][y].sensor.append("w")
                     textoutput_sensor("웜프스의 냄새가 납니다!", 800, 600)
                 if rooms[x][y].status == "pit":
+                    if not "p" in rooms[x][y].sensor:
+                        rooms[x][y].sensor.append("p")
                     textoutput_sensor("주위가 뜨겁습니다!", 800, 630)
 
     # 플레이어 렌더링

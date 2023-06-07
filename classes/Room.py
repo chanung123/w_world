@@ -7,3 +7,4 @@ class Room:
         self.status = "saferoom"
         self.canmove = False
         self.view = False
+        self.sensor = []
